@@ -1,0 +1,205 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Design tokens — extracted from design.md (Figma: Yummy_Knowie_Lucero).
+   :root holds the semantic tokens using Figma-mirroring names so the code
+   maps 1:1 to the design source. @theme inline exposes them as Tailwind
+   utility colors (bg-*, text-*, border-*). Never hardcode hex in components.
+   Dark mode is the only mode.
+   ============================================================ */
+
+:root {
+  /* Backgrounds */
+  --background-page: #090c18;        /* app base */
+  --background-surface: #22242f;     /* cards, sheets, controls */
+  --background-floating: rgba(61, 61, 61, 0.6);
+  --background-scrim: rgba(10, 10, 10, 0.5);
+  --background-inverse: #f4f2ff;
+
+  /* Text */
+  --text-primary: #f4f2ff;
+  --text-secondary: rgba(245, 243, 255, 0.68);
+  --text-disabled: rgba(255, 255, 255, 0.4);
+  --text-inverse: #090c18;
+  --text-link: #9178e6;
+
+  /* Interactive */
+  --interactive-primary: #f4f2ff;
+  --interactive-on-primary: #090c18;
+  --interactive-secondary: rgba(255, 255, 255, 0.1);
+  --interactive-on-secondary: #f4f2ff;
+  --interactive-destructive: #ff6b6b;
+  --interactive-disabled: rgba(255, 255, 255, 0.1);
+
+  /* Brand & mascot */
+  --accent-brand-bold: #9178e6;
+  --accent-brand-on-bold: #0e0a18;
+  --accent-brand-subtle: #15103a;
+  --accent-brand-on-subtle: #7b65e0;
+  --mascot-primary: #9178e6;
+
+  /* Accent families (summary stat cards, chips) */
+  --accent-coral-bold: #fb7e5b;
+  --accent-coral-subtle: #512e2c;
+  --accent-magenta-bold: #e879c0;
+  --accent-magenta-subtle: #380d29;
+  --accent-blue-bold: #5fa0fc;
+  --accent-blue-subtle: #0a1635;
+  --accent-blue-on-subtle: #7ba8f2;
+  --accent-green-bold: #00c386;
+  --accent-green-subtle: #0a2e22;
+
+  /* Feedback (transient verdict only — never persisted as a fail state) */
+  --feedback-success-bold: #00c386;
+  --feedback-success-subtle: #0a2e22;
+  --feedback-success-on-subtle: #4ae5b0;
+  --feedback-error-bold: #ff6b6b;
+  --feedback-error-subtle: #532831;
+  --feedback-error-on-subtle: #fca5a5;
+
+  /* Pro / premium (gold) — used by the partial verdict "Almost there!" */
+  --pro-bold: #f5b53d;
+  --pro-on-bold: #2a1d04;
+  --pro-subtle: #3a2d0b;
+  --pro-on-subtle: #fcd34d;
+  --hint-yellow: #f0b100; /* yellow/500 — the "Hint" affordance */
+
+  /* Borders */
+  --border-default: rgba(255, 255, 255, 0.1);
+
+  /* Radius (Size collection) */
+  --radius-100: 4px;
+  --radius-200: 8px;
+  --radius-400: 16px;
+  --radius-600: 24px;
+  --radius-800: 32px;
+  --radius-full: 9999px;
+
+  /* Elevation — the pressable-button inset used across the design's controls */
+  --shadow-button-inset: inset 0px -4px 0px 0px rgba(0, 0, 0, 0.15);
+  --shadow-sheet: 0px 16px 32px -4px rgba(12, 12, 13, 0.4);
+}
+
+@theme inline {
+  /* Colors → Tailwind utilities */
+  --color-page: var(--background-page);
+  --color-surface: var(--background-surface);
+  --color-floating: var(--background-floating);
+  --color-scrim: var(--background-scrim);
+  --color-inverse: var(--background-inverse);
+
+  --color-ink: var(--text-primary);
+  --color-ink-2: var(--text-secondary);
+  --color-ink-3: var(--text-disabled);
+  --color-ink-inv: var(--text-inverse);
+  --color-link: var(--text-link);
+
+  --color-primary: var(--interactive-primary);
+  --color-on-primary: var(--interactive-on-primary);
+  --color-secondary: var(--interactive-secondary);
+  --color-on-secondary: var(--interactive-on-secondary);
+  --color-destructive: var(--interactive-destructive);
+
+  --color-brand: var(--accent-brand-bold);
+  --color-brand-subtle: var(--accent-brand-subtle);
+  --color-brand-on-subtle: var(--accent-brand-on-subtle);
+  --color-mascot: var(--mascot-primary);
+
+  --color-coral: var(--accent-coral-bold);
+  --color-coral-subtle: var(--accent-coral-subtle);
+  --color-magenta: var(--accent-magenta-bold);
+  --color-magenta-subtle: var(--accent-magenta-subtle);
+  --color-blue: var(--accent-blue-bold);
+  --color-blue-subtle: var(--accent-blue-subtle);
+  --color-blue-on-subtle: var(--accent-blue-on-subtle);
+  --color-green: var(--accent-green-bold);
+  --color-green-subtle: var(--accent-green-subtle);
+
+  --color-success: var(--feedback-success-bold);
+  --color-success-subtle: var(--feedback-success-subtle);
+  --color-success-on-subtle: var(--feedback-success-on-subtle);
+  --color-error: var(--feedback-error-bold);
+  --color-error-subtle: var(--feedback-error-subtle);
+  --color-error-on-subtle: var(--feedback-error-on-subtle);
+
+  --color-pro: var(--pro-bold);
+  --color-pro-on: var(--pro-on-bold);
+  --color-pro-subtle: var(--pro-subtle);
+  --color-hint: var(--hint-yellow);
+
+  --color-border: var(--border-default);
+
+  /* Radius → Tailwind rounded-* */
+  --radius-xs: var(--radius-100);
+  --radius-sm: var(--radius-200);
+  --radius-md: var(--radius-400);
+  --radius-lg: var(--radius-600);
+  --radius-xl: var(--radius-800);
+
+  /* Font */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--background-page);
+  color: var(--text-primary);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Tighter tracking to echo the Greed display ramp on Inter */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+/* The prototype is a fixed 390px phone. Center it on larger viewports so it
+   reads as a device, and let it fill the screen on an actual phone. */
+.device-stage {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #05060d;
+}
+
+.device {
+  position: relative;
+  width: 390px;
+  max-width: 100vw;
+  height: 844px;
+  max-height: 100dvh;
+  overflow: hidden;
+  background: var(--background-page);
+}
+
+@media (max-width: 420px) {
+  .device-stage {
+    background: var(--background-page);
+  }
+  .device {
+    height: 100dvh;
+    box-shadow: none;
+  }
+}
+
+@media (min-width: 421px) {
+  .device {
+    border-radius: 44px;
+    box-shadow: 0 40px 120px -20px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Visible, on-brand focus ring for keyboard / assistive-tech users. */
+:focus-visible {
+  outline: 2px solid var(--accent-brand-bold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Hide focus ring for pointer users who didn't tab to it. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
