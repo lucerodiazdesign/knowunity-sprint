@@ -18,7 +18,7 @@ export function Processing({ prompt, transcript }: { prompt: string; transcript:
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden">
-      <div className="flex-1 overflow-y-auto px-4 pt-2">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-2">
         {/* One conversation turn (gap 16, per Figma): Knowie's question stays on
             top (left-aligned), the student's answer stacks below (right-aligned). */}
         <div className="flex flex-col gap-4">

@@ -157,9 +157,13 @@ export function RecallScreen({
     <div className="flex h-full flex-col">
       {topbar}
 
-      <div className="relative flex-1 overflow-hidden">
-        {/* Prompt bubble — top 24 (top 12 + tag on a pass-2 retry). */}
-        <div className="absolute left-4 right-4" style={{ top: pass === 2 ? 12 : 24 }}>
+      {/* middleContent — fills the column and scrolls INTERNALLY if the viewport
+          is too short (min-h-0 lets it shrink instead of pushing the controls
+          off-screen). Gap-based spacing per Figma 13766-13630 — no absolute
+          positioning, no fixed heights. */}
+      <div className="flex min-h-0 flex-1 flex-col gap-12 overflow-y-auto px-4 pt-6">
+        {/* Prompt bubble (+ Previous-Mistake tag on a pass-2 retry). */}
+        <div className="w-full">
           {pass === 2 && (
             <div className="mb-2">
               <PreviousMistakeTag />
@@ -168,30 +172,31 @@ export function RecallScreen({
           <KnowieBubble mascot={POSE.ask.src} alt={POSE.ask.alt}>{term.prompt}</KnowieBubble>
         </div>
 
-        {/* Answer waveform + helper — top 212, w 358. */}
-        <div className="absolute left-4 flex w-[358px] flex-col items-center" style={{ top: 212 }}>
+        {/* Answer waveform + helper. */}
+        <div className="flex w-full flex-col items-center">
           <Waveform mode={waveMode} progress={playProgress} />
           <p className="text-[12px] font-medium leading-4 tracking-[0.12px] text-ink-3">{helper}</p>
         </div>
-
-        {/* Control row + mic — top 376, centred, 30px gap. Controls unchanged. */}
-        <div className="absolute left-1/2 flex w-[248px] -translate-x-1/2 flex-col items-center" style={{ top: 376, gap: 30 }}>
-          <div className="flex w-[248px] items-start justify-between">
-            <ControlButton icon={<TrashIcon size={22} />} label="Borrar" onClick={() => dispatch({ type: "ERASE" })} disabled={!hasTake} />
-            <ControlButton
-              icon={playing ? <StopIcon size={20} /> : <PlayIcon size={22} />}
-              label="Reproducir"
-              onClick={onReplay}
-              disabled={!hasTake}
-            />
-            <ControlButton icon={<TextIcon size={24} />} label="Usar texto" onClick={() => dispatch({ type: "OPEN_TEXT" })} disabled={recording} />
-          </div>
-          <MicButton recording={recording} onClick={() => dispatch({ type: recording ? "STOP_MIC" : "TAP_MIC" })} />
-        </div>
       </div>
 
-      {/* Bottom action — p28, gap 2: Not relevant, then Send. */}
-      <div className="flex flex-col gap-0.5 px-7 pt-7" style={{ paddingBottom: "max(28px, env(safe-area-inset-bottom))" }}>
+      {/* Recording controls (Borrar / Reproducir / Usar texto + mic) — PINNED
+          (shrink-0). Never scrolls, never clips; 30px gap per the reference. */}
+      <div className="flex shrink-0 flex-col items-center gap-[30px] pt-2">
+        <div className="flex w-[248px] items-start justify-between">
+          <ControlButton icon={<TrashIcon size={22} />} label="Borrar" onClick={() => dispatch({ type: "ERASE" })} disabled={!hasTake} />
+          <ControlButton
+            icon={playing ? <StopIcon size={20} /> : <PlayIcon size={22} />}
+            label="Reproducir"
+            onClick={onReplay}
+            disabled={!hasTake}
+          />
+          <ControlButton icon={<TextIcon size={24} />} label="Usar texto" onClick={() => dispatch({ type: "OPEN_TEXT" })} disabled={recording} />
+        </div>
+        <MicButton recording={recording} onClick={() => dispatch({ type: recording ? "STOP_MIC" : "TAP_MIC" })} />
+      </div>
+
+      {/* Bottom action — Not relevant, then Send. PINNED (shrink-0); safe-area aware. */}
+      <div className="flex shrink-0 flex-col gap-0.5 px-7 pt-6 pb-[max(28px,env(safe-area-inset-bottom))]">
         <TextButton onClick={() => dispatch({ type: "SKIP" })}>No relevante</TextButton>
         {hasTake ? (
           <PillButton onClick={() => dispatch({ type: "SEND" })}>

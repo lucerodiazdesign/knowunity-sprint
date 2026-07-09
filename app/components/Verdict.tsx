@@ -112,7 +112,7 @@ export function Verdict({
           {kind !== "skip" && <Thumbs />}
         </div>
 
-        <div className="flex flex-col gap-6 px-7 pb-7 pt-5">
+        <div className="flex flex-col gap-6 px-7 pt-5 pb-[max(28px,env(safe-area-inset-bottom))]">
           {/* You covered */}
           {showCovered && covered.length > 0 && (
             <div className="flex flex-col gap-2 rounded-[24px] border-[6px] border-success-on-subtle bg-success-subtle p-4">

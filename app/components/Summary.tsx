@@ -50,7 +50,7 @@ export function Summary({
   return (
     <div className="flex h-full flex-col px-6" style={{ paddingTop: "max(16px, env(safe-area-inset-top))", paddingBottom: "max(24px, env(safe-area-inset-bottom))" }}>
       <motion.div
-        className="flex flex-1 flex-col overflow-y-auto pt-4"
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto pt-4"
         variants={reduce ? undefined : container}
         initial={reduce ? undefined : "hidden"}
         animate={reduce ? undefined : "show"}
@@ -111,8 +111,8 @@ export function Summary({
         </motion.p>
       </motion.div>
 
-      {/* Exits */}
-      <div className="mt-4 flex flex-col gap-2">
+      {/* Exits — pinned (shrink-0); the summary list above scrolls if too tall. */}
+      <div className="mt-4 flex shrink-0 flex-col gap-2">
         <PillButton onClick={onContinue} disabled={collecting}>
           {collecting ? (
             <motion.span

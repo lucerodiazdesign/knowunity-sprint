@@ -67,7 +67,7 @@ export function TopBar({
   onClose?: () => void;
 }) {
   return (
-    <div className="flex h-14 w-full items-center gap-1 px-3">
+    <div className="flex h-14 w-full shrink-0 items-center gap-1 px-3">
       <motion.button
         type="button"
         onClick={onClose}
