@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
-import { StatusBar } from "./components/chrome";
 import { RecallScreen } from "./components/RecallScreen";
 import { Summary } from "./components/Summary";
 import { Onboarding } from "./components/Onboarding";
@@ -10,6 +9,7 @@ import { PathScreen } from "./components/PathScreen";
 import { TextFallbackSheet, AIChatSheet } from "./components/overlays";
 import { useRecallMachine } from "./lib/useRecallMachine";
 import { TERMS } from "./lib/script";
+import { t } from "./lib/copy";
 import { soft } from "./lib/motion";
 
 export default function Page() {
@@ -50,9 +50,10 @@ export default function Page() {
   return (
     <div className="device-stage">
       <div className="device">
-        <StatusBar />
-
-        <div className="relative h-[calc(100%-48px)] w-full">
+        {/* Screens fill the full device height (status bar removed). The device
+            itself carries padding-top:env(safe-area-inset-top) (globals.css) so
+            the first header sits below a real phone's status bar. */}
+        <div className="relative h-full w-full">
           <AnimatePresence mode="wait">
             {state.stage === "path" && (
               <motion.div key="path" {...stageMotion}>
@@ -104,8 +105,8 @@ export default function Page() {
             {state.chatSheet && (
               <AIChatSheet
                 key="chat"
-                title="Historia 101"
-                heading="¿Qué te falta?"
+                title={t.chatTitle}
+                heading={t.chatHeading}
                 explanation={currentTerm.fullAnswer}
                 onClose={() => dispatch({ type: "CLOSE_CHAT" })}
               />

@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { CheckIcon, Grabber } from "./icons";
 import { sheet, gentle } from "../lib/motion";
+import { t } from "../lib/copy";
 import type { VerdictKind } from "../lib/useRecallMachine";
 
 /* ONE shared verdict screen for every term, parametrised by (kind, attempt).
@@ -37,7 +38,7 @@ export function Verdict({
 
   const showCovered = kind === "pass" || kind === "partial";
   const hasHintSection = kind === "partial" || kind === "fail";
-  const primaryLabel = kind === "pass" || kind === "skip" ? "Continuar" : "Entendido";
+  const primaryLabel = kind === "pass" || kind === "skip" ? t.verdictPrimaryPass : t.verdictPrimaryOther;
 
   const sheetBg =
     kind === "pass" ? "bg-success-subtle" : kind === "skip" ? "bg-brand-subtle" : "bg-surface";
@@ -49,19 +50,12 @@ export function Verdict({
         : kind === "fail"
           ? "text-error"
           : "text-link";
-  const title =
-    kind === "pass"
-      ? "¡Lo lograste!"
-      : kind === "partial"
-        ? "¡Casi lo tienes!"
-        : kind === "fail"
-          ? "No del todo"
-          : "¡Omitido!";
+  const title = t.verdictTitle[kind];
 
   // attempt 2 = the answer is revealed ("Let's lock it in"); attempt 1 = withheld hint.
   const sectionLabel =
-    attempt === 2 ? "Vamos a fijarlo" : kind === "partial" ? "¿Qué falta?" : "¿Necesitas una pista?";
-  const chipText = attempt === 2 ? "Respuesta" : "Pista";
+    attempt === 2 ? t.sectionLockIn : kind === "partial" ? t.sectionWhatsMissing : t.sectionNeedHint;
+  const chipText = attempt === 2 ? t.chipAnswer : t.chipHint;
   const chipTone = attempt === 2 ? "text-success" : "text-hint";
   const bodyText = attempt === 2 ? answer : hint;
   const bodyVisible = attempt === 2 || hintRevealed;
@@ -116,7 +110,7 @@ export function Verdict({
           {/* You covered */}
           {showCovered && covered.length > 0 && (
             <div className="flex flex-col gap-2 rounded-[24px] border-[6px] border-success-on-subtle bg-success-subtle p-4">
-              <p className="text-[18px] leading-6 tracking-[0.18px] text-success-on-subtle">Cubriste</p>
+              <p className="text-[18px] leading-6 tracking-[0.18px] text-success-on-subtle">{t.youCovered}</p>
               <ul className="flex flex-col gap-2">
                 {covered.map((c) => (
                   <li key={c} className="flex items-start gap-1.5">
@@ -172,7 +166,7 @@ export function Verdict({
               <button
                 type="button"
                 onClick={() => {}}
-                aria-label="Deshacer omitir"
+                aria-label={t.undoSkip}
                 className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-surface text-ink-2 shadow-[var(--shadow-button-inset)]"
               >
                 <UndoGlyph />
@@ -183,7 +177,7 @@ export function Verdict({
                 onClick={onWhy}
                 className="flex h-14 items-center justify-center rounded-[36px] bg-secondary px-6 text-[18px] font-bold text-on-secondary shadow-[var(--shadow-button-inset)]"
               >
-                ¿Por qué?
+                {t.why}
               </button>
             )}
             <motion.button

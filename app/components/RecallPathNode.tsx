@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 import { CheckIcon } from "./icons";
 import { snappy, gentle } from "../lib/motion";
+import { t } from "../lib/copy";
 import type { RecallStatus } from "../lib/useRecallMachine";
 
 // The Voice Recall path node. A dedicated 3-state node whose appearance is
@@ -35,20 +36,13 @@ export function RecallPathNode({
   // stubbed to relaunch for now).
   const tappable = !done;
 
-  // Localized status for the accessible label (mirrors RecallStatus values).
-  const statusLabel: Record<RecallStatus, string> = {
-    not_started: "sin empezar",
-    in_progress: "en progreso",
-    done: "completado",
-  };
-
   return (
     <div className="flex flex-col items-center gap-2">
       <motion.button
         type="button"
         onClick={tappable ? onLaunch : undefined}
         disabled={!tappable}
-        aria-label={`${label}, ${statusLabel[status]}`}
+        aria-label={`${label}, ${t.recallStatus[status]}`}
         whileTap={tappable && !reduce ? { scale: 0.94 } : undefined}
         transition={snappy}
         className="relative"
@@ -131,7 +125,7 @@ export function RecallPathNode({
             className="absolute left-1/2 flex h-[22px] -translate-x-1/2 items-center justify-center whitespace-nowrap rounded-full border-2 border-page bg-coral px-2.5 text-[10px] font-extrabold tracking-[0.4px] text-ink"
             style={{ top: GAP + SIZE - 14 }}
           >
-            NUEVO
+            {t.badgeNew}
           </motion.span>
         )}
       </motion.button>

@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { PathNode, Connector } from "./PathNode";
 import { RecallPathNode } from "./RecallPathNode";
 import { BoltIcon } from "./icons";
+import { t } from "../lib/copy";
 import type { MachineState } from "../lib/useRecallMachine";
 
 /* ---- Inline icons (chrome + sibling-node icons) ------------------------- */
@@ -83,6 +85,26 @@ export function PathScreen({
 }) {
   const done = state.recallStatus === "done";
 
+  // Fade-on-idle scrollbar: mark the container "is-scrolling" while scrolling,
+  // then clear it ~1s after the last scroll so the thumb fades out (see the
+  // `.path-scroll` rules in globals.css). Scoped to this screen only.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let idle: ReturnType<typeof setTimeout>;
+    const onScroll = () => {
+      el.classList.add("is-scrolling");
+      clearTimeout(idle);
+      idle = setTimeout(() => el.classList.remove("is-scrolling"), 1000);
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      clearTimeout(idle);
+    };
+  }, []);
+
   return (
     <div className="flex h-full flex-col">
       {/* Subject header */}
@@ -92,29 +114,29 @@ export function PathScreen({
             <BoltIcon size={16} />
             <span className="text-[15px] font-bold tabular-nums">{done ? 2 : 1}</span>
           </div>
-          <button type="button" className="flex items-center gap-1" aria-label="Cambiar asignatura">
+          <button type="button" className="flex items-center gap-1" aria-label={t.changeSubject}>
             <span aria-hidden>📚</span>
-            <span className="text-[20px] font-extrabold tracking-[-0.2px] text-ink">Historia</span>
+            <span className="text-[20px] font-extrabold tracking-[-0.2px] text-ink">{t.subject}</span>
             <Chevron />
           </button>
-          <button type="button" className="flex h-9 w-9 items-center justify-center rounded-full bg-surface" aria-label="Más">
+          <button type="button" className="flex h-9 w-9 items-center justify-center rounded-full bg-surface" aria-label={t.more}>
             <Kebab />
           </button>
         </div>
 
         <div className="mt-2 flex items-center justify-center gap-4 text-[13px]">
           <span className="flex items-center gap-1.5 text-ink-2">
-            <CalIcon /> 1 semana
+            <CalIcon /> {t.weekLeft}
           </span>
           <span className="flex items-center gap-1.5 text-ink-2">
-            <TargetIcon /> Meta: 12,5
+            <TargetIcon /> {t.goal}
           </span>
         </div>
 
         {/* Current-topic card */}
         <div className="mt-3 flex items-stretch overflow-hidden rounded-lg ring-1 ring-border">
           <div className="flex flex-1 items-center px-4 py-3.5">
-            <span className="text-[16px] font-bold text-ink">Sistema Feudal</span>
+            <span className="text-[16px] font-bold text-ink">{t.currentTopic}</span>
           </div>
           <div className="flex items-center justify-center border-l border-border px-4">
             <BookIcon />
@@ -123,18 +145,18 @@ export function PathScreen({
       </div>
 
       {/* The path */}
-      <div className="flex-1 overflow-y-auto px-6 pb-6 pt-4">
+      <div ref={scrollRef} className="path-scroll flex-1 overflow-y-auto px-6 pb-6 pt-4">
         <div className="flex flex-col items-center">
-          <PathNode state="completed" badge="check" label="Conceptos Clave" icon={<DocQIcon />} />
+          <PathNode state="completed" badge="check" label={t.pathKeyConcepts} icon={<DocQIcon />} />
           <Connector done />
-          <PathNode state="completed" badge="check" label="Análisis de Errores" icon={<DocQIcon />} />
+          <PathNode state="completed" badge="check" label={t.pathErrorAnalysis} icon={<DocQIcon />} />
           <Connector done />
 
           {/* Final-review section header — thin centered divider. */}
           <div className="my-4 flex w-full items-center gap-3">
             <span className="h-px flex-1 bg-border" />
             <span className="whitespace-nowrap text-[13px] font-bold tracking-[0.1px] text-ink-3">
-              Revisión Final y Conexiones
+              {t.pathFinalReview}
             </span>
             <span className="h-px flex-1 bg-border" />
           </div>
@@ -143,7 +165,7 @@ export function PathScreen({
               driven by recallStatus; never inherits the sibling treatment. */}
           <RecallPathNode
             status={state.recallStatus}
-            label="Desafío Final"
+            label={t.pathRecall}
             onLaunch={() => dispatch({ type: "LAUNCH_RECALL" })}
           />
           <Connector done={done} dots={2} />
@@ -152,8 +174,8 @@ export function PathScreen({
           <PathNode
             state={done ? "available" : "upcoming"}
             badge={done ? "next" : "none"}
-            label="Simulación de Examen"
-            caption="Examen de práctica"
+            label={t.pathMockExam}
+            caption={t.practiceTest}
             icon={<PracticeIcon />}
           />
         </div>

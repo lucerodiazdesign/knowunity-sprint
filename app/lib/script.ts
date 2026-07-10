@@ -18,6 +18,8 @@
 // exactly one of: unaided_pass, passed_with_hints, revealed, skipped.
 // ============================================================
 
+import { LANG } from "./copy";
+
 export type Terminal =
   | "unaided_pass"
   | "passed_with_hints"
@@ -53,7 +55,9 @@ export interface Term {
   attempt2Transcript: string;
 }
 
-export const TERMS: Term[] = [
+// Seeded demo content is locale-dependent — keyed off LANG (copy.ts). Flip LANG
+// there to switch the whole app, this content included.
+const TERMS_ES: Term[] = [
   {
     id: "feudal-system",
     subject: "Historia",
@@ -123,6 +127,76 @@ export const TERMS: Term[] = [
       "Se fabricaba mucho más en fábricas con máquinas, y pasó en Gran Bretaña porque se les daba bien el comercio.",
   },
 ];
+
+const TERMS_EN: Term[] = [
+  {
+    id: "feudal-system",
+    subject: "History",
+    title: "The feudal system",
+    prompt:
+      "Explain the feudal system in your own words — what was the relationship between lords and vassals, and what did each side get out of it?",
+    themes: [
+      "Land granted in exchange for loyalty",
+      "Vassals owed military service (knights)",
+      "Serfs worked the land for protection",
+    ],
+    partialCovered: 3,
+    hint: "",
+    fullAnswer:
+      "Feudalism was a medieval system built on land and loyalty. A monarch granted land (a fief) to lords, who became vassals owing military service and allegiance in return. Peasants and serfs worked that land in exchange for protection. Duties flowed up the hierarchy; land and protection flowed down.",
+    attempt1Result: "pass",
+    attempt2Result: "pass",
+    attempt1Transcript:
+      "It was a system where the king gave land to lords, and in return the lords — the vassals — swore loyalty and gave military service, like providing knights. Peasants worked the land in exchange for protection. So basically land was traded for loyalty and service up and down the ranks.",
+    attempt2Transcript: "",
+  },
+  {
+    id: "causes-ww1",
+    subject: "History",
+    title: "Causes of World War I",
+    prompt:
+      "Explain the main causes of World War I — what actually tipped Europe into war in 1914?",
+    themes: [
+      "The assassination of Franz Ferdinand was the spark",
+      "Rival alliances dragged countries in",
+      "Long-term M.A.I.N. causes built the tension",
+    ],
+    partialCovered: 1,
+    hint: "You've got the spark — the assassination in 1914. But think about the years of build-up before it. What rival systems had Europe locked into a standoff?",
+    fullAnswer:
+      "WWI's long-term causes are summed up as M.A.I.N.: Militarism (an arms race), Alliances (two rival blocs — the Triple Entente and Triple Alliance), Imperialism (competition for colonies), and Nationalism (rival ambitions, especially in the Balkans). The assassination of Archduke Franz Ferdinand in Sarajevo in June 1914 was the immediate trigger that set the alliances in motion.",
+    attempt1Result: "partial",
+    attempt2Result: "partial",
+    attempt1Transcript:
+      "There was a lot of tension between countries, and then someone important got assassinated, so war broke out.",
+    attempt2Transcript:
+      "Um… there were alliances between countries, and the assassination kicked it off?",
+  },
+  {
+    id: "industrial-revolution",
+    subject: "History",
+    title: "The Industrial Revolution",
+    prompt:
+      "Explain the Industrial Revolution — what changed, and why did it start in Britain?",
+    themes: [
+      "Machines and factories replaced hand production",
+      "Britain's coal and iron powered it",
+      "Capital from trade and empire funded it",
+    ],
+    partialCovered: 0,
+    hint: "Think about what Britain had loads of, right in the ground, to power all those new machines — and where people moved to run them.",
+    fullAnswer:
+      "The Industrial Revolution (c. 1760–1840) was the shift from hand production to machine manufacturing in factories. It began in Britain thanks to abundant coal and iron, capital from trade and empire, key inventions (the steam engine, spinning and weaving machines), and a workforce moving into fast-growing industrial cities.",
+    attempt1Result: "fail",
+    attempt2Result: "fail",
+    attempt1Transcript:
+      "It's when factories and machines got invented and people started making a lot more stuff.",
+    attempt2Transcript:
+      "Loads more got made in factories with machines, and it happened in Britain because they were good at trade.",
+  },
+];
+
+export const TERMS: Term[] = LANG === "en" ? TERMS_EN : TERMS_ES;
 
 // XP awarded per completed term (counts up on screen, collected only at Summary).
 export const XP_PER_TERM = 10;

@@ -171,6 +171,9 @@ body {
   max-width: 100vw;
   height: 844px;
   max-height: 100dvh;
+  /* Faux status bar removed — content now starts at the top. Keep it clear of a
+     real phone's status bar / notch (0 on desktop where env() resolves to 0). */
+  padding-top: env(safe-area-inset-top);
   overflow: hidden;
   background: var(--background-page);
 }
@@ -202,4 +205,31 @@ body {
 /* Hide focus ring for pointer users who didn't tab to it. */
 :focus:not(:focus-visible) {
   outline: none;
+}
+
+/* Brand scrollbar — scoped to the Exam Plan / path scroll container (.path-scroll).
+   Transparent track; slim, fully-rounded thumb in the NOT_STARTED node-fill gray
+   (--background-surface). Fades out ~1s after scrolling: the `.is-scrolling` class
+   is toggled in PathScreen, and background-color transitions in/out (WebKit).
+   Firefox degrades gracefully via scrollbar-width/scrollbar-color (no fade). */
+.path-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.path-scroll.is-scrolling {
+  scrollbar-color: var(--background-surface) transparent;
+}
+.path-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.path-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.path-scroll::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 9999px;
+  transition: background-color 0.4s ease;
+}
+.path-scroll.is-scrolling::-webkit-scrollbar-thumb {
+  background-color: var(--background-surface);
 }

@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 import { CheckIcon } from "./icons";
 import { snappy, gentle } from "../lib/motion";
+import { t } from "../lib/copy";
 
 // One shared path-node component; every step on the path is an instance of it —
 // the Recall node is a peer, not a special case.
@@ -47,7 +48,7 @@ export function PathNode({
         type="button"
         onClick={tappable ? onTap : undefined}
         disabled={!tappable}
-        aria-label={`${label}${completed ? ", completado" : badge === "new" ? ", nuevo" : badge === "next" ? ", siguiente" : ""}`}
+        aria-label={`${label}${completed ? t.a11yCompleted : badge === "new" ? t.a11yNew : badge === "next" ? t.a11yUpNext : ""}`}
         whileTap={tappable && !reduce ? { scale: 0.94 } : undefined}
         transition={snappy}
         className="relative"
@@ -133,7 +134,7 @@ function Badge({ kind }: { kind: NodeBadge }) {
       }`}
       style={{ top: top + 2 }}
     >
-      {isNew ? "NUEVO" : "SIGUIENTE"}
+      {isNew ? t.badgeNew : t.badgeUpNext}
     </motion.span>
   );
 }

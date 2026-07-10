@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { t, LANG } from "./lib/copy";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -9,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Knowunity · Recall de Voz",
-  description: "Explícalo en voz alta — Knowie comprueba tu recall.",
+  title: t.metaTitle,
+  description: t.metaDescription,
 };
 
 export const viewport: Viewport = {
@@ -28,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={inter.variable}>
+    <html lang={LANG} className={inter.variable}>
       <body>{children}</body>
     </html>
   );

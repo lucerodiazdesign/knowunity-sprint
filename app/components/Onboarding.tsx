@@ -6,6 +6,7 @@ import Image from "next/image";
 import { PillButton } from "./controls";
 import { CloseIcon } from "./icons";
 import { gentle, soft } from "../lib/motion";
+import { t } from "../lib/copy";
 import type { MachineState } from "../lib/useRecallMachine";
 
 // The 2-screen recall onboarding. Only the slide CONTENT (art + headline +
@@ -26,7 +27,7 @@ function PageControl({ active }: { active: 0 | 1 }) {
           className={`h-2 w-2 rounded-full bg-ink ${i === active ? "opacity-100" : "opacity-30"}`}
         />
       ))}
-      <span className="sr-only">Paso {active + 1} de 2</span>
+      <span className="sr-only">{t.step(active + 1)}</span>
     </div>
   );
 }
@@ -78,19 +79,19 @@ function Slide({ artSrc, artAlt, artWidth, artHeight, headline, subtitle }: Slid
 const SLIDES: SlideData[] = [
   {
     artSrc: "/images/knowie-bubble-mic.png",
-    artAlt: "Knowie en una burbuja con un micrófono",
+    artAlt: t.slide1Alt,
     artWidth: 326,
     artHeight: 340,
-    headline: "You've read it. Can you say it?",
-    subtitle: "Explain each idea to Knowie out loud. That's how you find out what you actually know.",
+    headline: t.slide1Headline,
+    subtitle: t.slide1Subtitle,
   },
   {
     artSrc: "/images/mic-permision.png",
-    artAlt: "Knowie preparando la solicitud de permiso del micrófono",
+    artAlt: t.slide2Alt,
     artWidth: 326,
     artHeight: 386,
-    headline: "Dale a Knowie acceso a tu micrófono",
-    subtitle: "Respuestas adaptadas a tus clases",
+    headline: t.slide2Headline,
+    subtitle: t.slide2Subtitle,
   },
 ];
 
@@ -127,7 +128,7 @@ export function Onboarding({
     else onPrimerContinue();
   };
   const ctaBusy = page === 1 && micBusy;
-  const ctaLabel = ctaBusy ? "Solicitando…" : "Continuar";
+  const ctaLabel = ctaBusy ? t.requesting : t.continue;
 
   return (
     <div className="flex h-full flex-col">
@@ -136,7 +137,7 @@ export function Onboarding({
         <button
           type="button"
           onClick={() => dispatch({ type: "RETURN_TO_PATH" })}
-          aria-label="Cerrar introducción"
+          aria-label={t.closeIntro}
           className="flex h-11 w-11 items-center justify-center rounded-full text-ink"
         >
           <CloseIcon size={24} />

@@ -6,16 +6,30 @@ import { useState } from "react";
 import { PillButton, GhostButton } from "./controls";
 import { BoltIcon } from "./icons";
 import { TERMS, type Terminal } from "../lib/script";
+import { t } from "../lib/copy";
 import { gentle } from "../lib/motion";
 import type { MachineState } from "../lib/useRecallMachine";
 
-// Path-based labels — never a score, never "mastered".
-const LABEL: Record<Terminal, { text: string; tone: string }> = {
-  unaided_pass: { text: "Por tu cuenta", tone: "text-success-on-subtle" },
-  passed_with_hints: { text: "Con una pista", tone: "text-blue-on-subtle" },
-  revealed: { text: "Lo repasamos juntos", tone: "text-brand-on-subtle" },
-  skipped: { text: "Omitido por ahora", tone: "text-ink-3" },
+// Per-term row tag colors, keyed by terminal state. Figma maps text = X/bold on
+// bg = X/onbold. Code has an exact token only for pro/onbold (→ pro-on); green
+// and error have no "onbold" token, so the nearest existing dark token is used
+// (green-subtle / error-subtle — flagged in the report). `skipped` is a TODO
+// placeholder tag and is deliberately NOT the reveal tag.
+const TAG: Record<Terminal, { text: string; bg: string }> = {
+  unaided_pass: { text: "text-green", bg: "bg-green-subtle" }, // accent/green/onbold → green-subtle (closest existing)
+  passed_with_hints: { text: "text-pro", bg: "bg-pro-on" }, // pro/onbold → pro-on (exact)
+  revealed: { text: "text-error", bg: "bg-error-subtle" }, // feedback/error/onbold → error-subtle (closest existing)
+  // TODO(Lucero): skipped treatment undecided — own tag vs folded into
+  // "Worth another look". Neutral placeholder; NOT reusing the reveal tag.
+  skipped: { text: "text-ink-2", bg: "bg-surface" },
 };
+
+// TODO(Lucero): SCORE is UNDEFINED and CLAUDE.md forbids a summary score
+// ("Summary never shows a score … No weighted composite score, ever."). The
+// numerator/denominator is unspecified, so the value is intentionally NOT bound
+// to a guessed count — placeholder only. The box renders per Figma so you can
+// decide whether to keep a SCORE at all, and what it should mean.
+const SCORE_TODO = "–/–";
 
 const container = {
   hidden: {},
@@ -25,6 +39,35 @@ const item = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: gentle },
 };
+
+// Bullseye — the SCORE box icon (matches Figma's target glyph).
+function TargetGlyph({ className }: { className?: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="1.6" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Mascot inside a surface-colored circle. Figma's `knowie-bubble` /
+// `knowie-bubble-1` is a bg-surface circle with the LOCAL mascot PNG clipped
+// inside — approving for failed/partial, giggling for passed.
+function MascotBubble({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className="relative h-[122px] w-[122px] shrink-0 overflow-hidden rounded-full bg-surface">
+      <Image
+        src={src}
+        alt={alt}
+        width={134}
+        height={146}
+        priority
+        className="absolute left-1/2 top-3 max-w-none -translate-x-1/2"
+      />
+    </div>
+  );
+}
 
 export function Summary({
   state,
@@ -36,9 +79,41 @@ export function Summary({
   const reduce = useReducedMotion();
   const [collecting, setCollecting] = useState(false);
 
-  const unaided = state.results.filter((r) => r === "unaided_pass").length;
   const total = TERMS.length;
-  const hasMissed = state.results.some((r) => r && r !== "unaided_pass");
+  const results = state.results;
+  const unaidedCount = results.filter((r) => r === "unaided_pass").length;
+  const passedCount = results.filter(
+    (r) => r === "unaided_pass" || r === "passed_with_hints",
+  ).length;
+  const hasMissed = results.some((r) => r && r !== "unaided_pass");
+
+  // Outcome routing (CLAUDE.md's four terminal states). Exhaustive 3-way split:
+  //   passed  = every term unaided_pass
+  //   partial = at least one passed (unaided OR with-hints), but not all-unaided
+  //   failed  = no term passed (all revealed/skipped)
+  const outcome: "passed" | "partial" | "failed" =
+    unaidedCount === total ? "passed" : passedCount >= 1 ? "partial" : "failed";
+
+  const STATE = {
+    passed: {
+      title: t.summaryTitlePassed,
+      subtitle: t.summarySubtitlePassed,
+      src: "/images/giggling.png",
+      alt: t.summaryMascotGiggling,
+    },
+    partial: {
+      title: t.summaryTitlePartial,
+      subtitle: t.summarySubtitleTryAgain,
+      src: "/images/approving.png",
+      alt: t.summaryMascotApproving,
+    },
+    failed: {
+      title: t.summaryTitleFailed,
+      subtitle: t.summarySubtitleTryAgain,
+      src: "/images/approving.png",
+      alt: t.summaryMascotApproving,
+    },
+  }[outcome];
 
   function onContinue() {
     setCollecting(true);
@@ -48,70 +123,85 @@ export function Summary({
   }
 
   return (
-    <div className="flex h-full flex-col px-6" style={{ paddingTop: "max(16px, env(safe-area-inset-top))", paddingBottom: "max(24px, env(safe-area-inset-bottom))" }}>
+    <div
+      className="flex h-full flex-col px-6"
+      style={{ paddingTop: "max(16px, env(safe-area-inset-top))", paddingBottom: "max(24px, env(safe-area-inset-bottom))" }}
+    >
+      {/* middleContent — the autolayout-fill container (kept: min-h-0 flex-1 fill;
+          scrolls internally if the viewport is short). */}
       <motion.div
-        className="flex min-h-0 flex-1 flex-col overflow-y-auto pt-4"
+        className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pt-2"
         variants={reduce ? undefined : container}
         initial={reduce ? undefined : "hidden"}
         animate={reduce ? undefined : "show"}
       >
-        <motion.div variants={reduce ? undefined : item} className="flex flex-col items-center text-center">
-          <Image src="/images/amazed.png" alt="Knowie, encantado con tu sesión" width={150} height={150} priority />
-          <h1 className="mt-2 text-[28px] font-extrabold leading-[30px] tracking-[-0.4px] text-ink">
-            ¡Buen trabajo!
-          </h1>
-          <p className="mt-2 text-[16px] leading-[22px] text-ink-2">
-            Explicaste{" "}
-            <span className="font-bold text-ink">
-              {unaided} de {total}
-            </span>{" "}
-            por tu cuenta.
-          </p>
-        </motion.div>
-
-        {/* Stat cards — no score. */}
-        <motion.div variants={reduce ? undefined : item} className="mt-6 flex gap-3">
-          <div className="flex flex-1 flex-col gap-1 rounded-md bg-surface p-4">
-            <span className="flex items-center gap-1 text-blue-on-subtle">
-              <BoltIcon size={16} />
-              <span className="text-[12px] font-bold">XP ganada</span>
-            </span>
-            <span className="text-[24px] font-extrabold text-ink tabular-nums">+{state.xp}</span>
-          </div>
-          <div className="flex flex-1 flex-col gap-1 rounded-md bg-surface p-4">
-            <span className="text-[12px] font-bold text-success-on-subtle">Sin ayuda</span>
-            <span className="text-[24px] font-extrabold text-ink tabular-nums">
-              {unaided}
-              <span className="text-[16px] text-ink-3">/{total}</span>
-            </span>
+        {/* Mascot + title + subtitle — hugs the top; the rows below grow to fill. */}
+        <motion.div
+          variants={reduce ? undefined : item}
+          className="flex shrink-0 flex-col items-center gap-3 pt-2 pb-4 text-center"
+        >
+          <MascotBubble src={STATE.src} alt={STATE.alt} />
+          <div className="flex flex-col items-center gap-2">
+            <h1 className="text-[40px] font-extrabold leading-[42px] tracking-[-0.4px] text-ink">
+              {STATE.title}
+            </h1>
+            <p className="max-w-[300px] text-[21px] leading-6 text-ink-2">{STATE.subtitle}</p>
           </div>
         </motion.div>
 
-        {/* Per-term breakdown. */}
-        <motion.ul variants={reduce ? undefined : item} className="mt-5 flex flex-col gap-2">
-          {TERMS.map((t, i) => {
+        {/* XP + SCORE boxes. */}
+        <motion.div variants={reduce ? undefined : item} className="flex shrink-0 gap-4">
+          {/* XP — bound to the session XP count (state.xp). */}
+          <div className="flex flex-1 flex-col items-center rounded-md border-2 border-blue bg-blue">
+            <span className="py-1 text-[15px] font-bold leading-5 tracking-[0.15px] text-ink-inv">
+              {t.xpBoxLabel}
+            </span>
+            <div className="flex w-full items-center justify-center gap-1.5 rounded-md bg-page p-3">
+              <BoltIcon size={22} className="text-blue" />
+              <span className="text-[24px] font-bold leading-5 tabular-nums text-blue">{state.xp}</span>
+            </div>
+          </div>
+          {/* SCORE — value is a marked TODO (see SCORE_TODO / report). */}
+          <div className="flex flex-1 flex-col items-center rounded-md border-2 border-green bg-green">
+            <span className="py-1 text-[15px] font-bold leading-5 tracking-[0.15px] text-ink-inv">
+              {t.scoreBoxLabel}
+            </span>
+            <div className="flex w-full items-center justify-center gap-1.5 rounded-md bg-page p-3">
+              <TargetGlyph className="text-green" />
+              <span className="text-[24px] font-bold leading-5 tabular-nums text-green">{SCORE_TODO}</span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Per-term rows — term title + terminal-state tag. Grows (like the
+            mascot block) so the XP/SCORE boxes sit centered, per Figma. */}
+        <motion.ul variants={reduce ? undefined : item} className="flex min-h-0 flex-1 flex-col gap-2 pb-1">
+          {TERMS.map((term, i) => {
             const r = state.results[i];
-            // By the summary every term is terminal; guard the transient state.
-            const label = r && r !== "pending_retry" ? LABEL[r] : { text: "—", tone: "text-ink-3" };
+            // Every term is terminal by the summary; guard the transient state.
+            const key: Terminal = r && r !== "pending_retry" ? r : "skipped";
+            const tag = TAG[key];
             return (
-              <li key={t.id} className="flex items-center justify-between rounded-md bg-surface px-4 py-3">
-                <span className="mr-3 flex-1 truncate text-[15px] font-semibold text-ink">
-                  {t.title}
+              <li
+                key={term.id}
+                className="flex items-center gap-2 rounded-md bg-secondary px-3 py-3"
+              >
+                <span className="min-w-0 flex-1 truncate text-[15px] font-bold text-ink">
+                  {term.title}
                 </span>
-                <span className={`shrink-0 text-[13px] font-bold ${label.tone}`}>{label.text}</span>
+                <span
+                  className={`shrink-0 rounded-full px-2 py-1 text-[15px] font-bold leading-4 ${tag.text} ${tag.bg}`}
+                >
+                  {t.summaryLabel[key]}
+                </span>
               </li>
             );
           })}
         </motion.ul>
-
-        <motion.p variants={reduce ? undefined : item} className="mt-4 text-center text-[13px] leading-[18px] text-ink-2">
-          {hasMissed
-            ? "El recall se fija con la repetición: vuelve a practicar los que no clavaste y repite antes del examen."
-            : "Vas muy bien. Vuelve y repite antes del examen para fijarlo."}
-        </motion.p>
       </motion.div>
 
-      {/* Exits — pinned (shrink-0); the summary list above scrolls if too tall. */}
+      {/* Exits — HELD per Lucero (do NOT apply Figma's Share / Claim XP). Pinned
+          (shrink-0); the content above scrolls if too tall. */}
       <div className="mt-4 flex shrink-0 flex-col gap-2">
         <PillButton onClick={onContinue} disabled={collecting}>
           {collecting ? (
@@ -121,15 +211,15 @@ export function Summary({
               animate={{ scale: [1, 1.15, 1] }}
               transition={{ duration: 0.5 }}
             >
-              <BoltIcon size={18} /> +{state.xp} conseguidos
+              <BoltIcon size={18} /> {t.xpCollected(state.xp)}
             </motion.span>
           ) : (
-            "Continuar"
+            t.continue
           )}
         </PillButton>
         {hasMissed && (
           <GhostButton onClick={() => dispatch({ type: "TRY_MISSED" })} disabled={collecting}>
-            Repite los más difíciles
+            {t.tryTricky}
           </GhostButton>
         )}
       </div>

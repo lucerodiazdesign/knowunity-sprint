@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 import { MicIcon, StopIcon } from "./icons";
 import { snappy } from "../lib/motion";
+import { t } from "../lib/copy";
 
 /* The mic — the most-tapped control. White circle, black glyph (per frame).
    Recording is signalled by shape (mic → stop), a calm pulse, AND the label,
@@ -46,7 +47,7 @@ export function MicButton({
             : snappy
         }
         className="relative flex h-[88px] w-[88px] items-center justify-center rounded-full bg-primary text-on-primary shadow-[var(--shadow-button-inset)] disabled:opacity-60"
-        aria-label={recording ? "Detener grabación" : "Empezar a grabar"}
+        aria-label={recording ? t.stopRecording : t.startRecording}
         aria-pressed={recording}
       >
         {recording ? <StopIcon size={30} /> : <MicIcon size={32} />}

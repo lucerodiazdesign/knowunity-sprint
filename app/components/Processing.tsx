@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
+import { t } from "../lib/copy";
 
 /* Processing / "thinking" state — matches Figma node 13713-12384:
    the conversation turn (Knowie's question, left + the student's answer, right)
@@ -47,7 +48,7 @@ export function Processing({ prompt, transcript }: { prompt: string; transcript:
 
         {/* Knowie's thinking line, with a looping ellipsis. */}
         <h2 className="mt-6 max-w-[240px] text-[28px] font-extrabold leading-[30px] tracking-[-0.2px] text-ink">
-          Mmm, dame un segundo
+          {t.thinking}
           <Dots animate={!reduce} />
         </h2>
       </div>

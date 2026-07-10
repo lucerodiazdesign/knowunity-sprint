@@ -14,10 +14,11 @@ import { TrashIcon, PlayIcon, StopIcon, TextIcon, SendIcon } from "./icons";
 import { Processing } from "./Processing";
 import { Verdict } from "./Verdict";
 import { TERMS } from "../lib/script";
+import { t } from "../lib/copy";
 import type { MachineState } from "../lib/useRecallMachine";
 
 const POSE = {
-  ask: { src: "/images/standby.png", alt: "Knowie esperando, listo para escucharte" },
+  ask: { src: "/images/standby.png", alt: t.knowieAskAlt },
 };
 
 // A short silent WAV, generated at runtime, used as the "recorded take" so
@@ -146,12 +147,12 @@ export function RecallScreen({
         ? "still"
         : "idle";
   const helper = recording
-    ? "Escuchando… toca para parar"
+    ? t.helperRecording
     : playing
-      ? "Reproduciendo…"
+      ? t.helperPlaying
       : hasTake
-        ? "¿Te convence? Envíalo"
-        : "Toca el micro para empezar";
+        ? t.helperReview
+        : t.helperIdle;
 
   return (
     <div className="flex h-full flex-col">
@@ -183,27 +184,27 @@ export function RecallScreen({
           (shrink-0). Never scrolls, never clips; 30px gap per the reference. */}
       <div className="flex shrink-0 flex-col items-center gap-[30px] pt-2">
         <div className="flex w-[248px] items-start justify-between">
-          <ControlButton icon={<TrashIcon size={22} />} label="Borrar" onClick={() => dispatch({ type: "ERASE" })} disabled={!hasTake} />
+          <ControlButton icon={<TrashIcon size={22} />} label={t.erase} onClick={() => dispatch({ type: "ERASE" })} disabled={!hasTake} />
           <ControlButton
             icon={playing ? <StopIcon size={20} /> : <PlayIcon size={22} />}
-            label="Reproducir"
+            label={t.replay}
             onClick={onReplay}
             disabled={!hasTake}
           />
-          <ControlButton icon={<TextIcon size={24} />} label="Usar texto" onClick={() => dispatch({ type: "OPEN_TEXT" })} disabled={recording} />
+          <ControlButton icon={<TextIcon size={24} />} label={t.useText} onClick={() => dispatch({ type: "OPEN_TEXT" })} disabled={recording} />
         </div>
         <MicButton recording={recording} onClick={() => dispatch({ type: recording ? "STOP_MIC" : "TAP_MIC" })} />
       </div>
 
       {/* Bottom action — Not relevant, then Send. PINNED (shrink-0); safe-area aware. */}
       <div className="flex shrink-0 flex-col gap-0.5 px-7 pt-6 pb-[max(28px,env(safe-area-inset-bottom))]">
-        <TextButton onClick={() => dispatch({ type: "SKIP" })}>No relevante</TextButton>
+        <TextButton onClick={() => dispatch({ type: "SKIP" })}>{t.notRelevant}</TextButton>
         {hasTake ? (
           <PillButton onClick={() => dispatch({ type: "SEND" })}>
-            Enviar <SendIcon size={20} />
+            {t.send} <SendIcon size={20} />
           </PillButton>
         ) : (
-          <GhostButton disabled>Enviar</GhostButton>
+          <GhostButton disabled>{t.send}</GhostButton>
         )}
       </div>
 
@@ -237,7 +238,7 @@ function PreviousMistakeTag() {
           <path d="M19 5v4h-4M5 19v-4h4" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </span>
-      <span className="text-[15px] font-bold tracking-[0.15px] text-pro">Error anterior</span>
+      <span className="text-[15px] font-bold tracking-[0.15px] text-pro">{t.previousMistake}</span>
     </div>
   );
 }

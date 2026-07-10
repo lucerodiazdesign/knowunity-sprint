@@ -1,10 +1,11 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion, useDragControls, type PanInfo } from "motion/react";
+import { useRef, useState } from "react";
 import { Grabber, MicIcon } from "./icons";
 import { PillButton, TextButton } from "./controls";
 import { sheet, soft } from "../lib/motion";
+import { t } from "../lib/copy";
 
 function Scrim({ onClick }: { onClick?: () => void }) {
   return (
@@ -65,22 +66,22 @@ export function TextFallbackSheet({
   return (
     <SheetShell labelledBy="text-title" onDismiss={onClose}>
       <h2 id="text-title" className="text-[18px] font-extrabold leading-[20px] text-ink">
-        Escribe tu respuesta
+        {t.typeAnswer}
       </h2>
-      <p className="mt-1 text-[13px] text-ink-2">Es como decirlo — explica el término con tus propias palabras.</p>
+      <p className="mt-1 text-[13px] text-ink-2">{t.typeAnswerHelp}</p>
       <textarea
         autoFocus
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={4}
-        placeholder="Con tus propias palabras…"
+        placeholder={t.typeAnswerPlaceholder}
         className="mt-3 w-full resize-none rounded-md bg-surface p-4 text-[15px] leading-[20px] text-ink placeholder:text-ink-3 focus:outline-none"
       />
       <div className="mt-4 flex flex-col gap-2">
         <PillButton onClick={() => onSubmit(text.trim())} disabled={text.trim().length === 0}>
-          Enviar
+          {t.send}
         </PillButton>
-        <TextButton onClick={onClose}>Volver a la voz</TextButton>
+        <TextButton onClick={onClose}>{t.backToVoice}</TextButton>
       </div>
     </SheetShell>
   );
@@ -108,6 +109,21 @@ export function AIChatSheet({
   onClose: () => void;
 }) {
   const reduce = useReducedMotion();
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const dragControls = useDragControls();
+
+  // iOS-standard drag-to-dismiss: dismiss when dragged past ~40% of the sheet's
+  // own height OR flicked down fast enough; otherwise the drag springs back.
+  const DISMISS_FRACTION = 0.4;
+  const DISMISS_VELOCITY = 500; // px/s, downward
+  const onDragEnd = (_: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
+    const h = sheetRef.current?.offsetHeight ?? 400;
+    const draggedFar = info.offset.y > h * DISMISS_FRACTION;
+    const flickedDown = info.velocity.y > DISMISS_VELOCITY;
+    if (draggedFar || flickedDown) onClose();
+    // else: dragConstraints + dragTransition spring the sheet back to rest.
+  };
+
   return (
     <div className="absolute inset-0 z-30">
       {/* Branded gradient scrim: transparent at the top (the term shows through),
@@ -126,8 +142,11 @@ export function AIChatSheet({
         aria-hidden
       />
 
-      {/* Floating chat card — 8px insets, resting near the bottom. */}
+      {/* Floating chat card — 8px insets, resting near the bottom. Drag-to-dismiss
+          is driven from the grabber only (dragListener=false + controls.start on
+          the handle); the body scrolls on its own without dragging the sheet. */}
       <motion.div
+        ref={sheetRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -135,11 +154,21 @@ export function AIChatSheet({
         animate={reduce ? { opacity: 1 } : { y: 0 }}
         exit={reduce ? { opacity: 0 } : { y: "100%" }}
         transition={sheet}
-        className="absolute inset-x-2 bottom-2 flex flex-col overflow-hidden rounded-md border-2 border-border bg-page"
+        drag="y"
+        dragControls={dragControls}
+        dragListener={false}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 1 }}
+        dragTransition={{ bounceStiffness: 500, bounceDamping: 45 }}
+        onDragEnd={onDragEnd}
+        className="absolute inset-x-2 bottom-2 flex max-h-[calc(100%-1rem)] flex-col overflow-hidden rounded-md border-2 border-border bg-page"
       >
-        {/* App bar: drag handle + channel title + expand affordance. */}
-        <div className="relative flex min-h-16 flex-col pt-3">
-          <div className="absolute left-1/2 top-1.5 -translate-x-1/2">
+        {/* App bar: grabber (the sole drag affordance) + channel title + expand. */}
+        <div className="relative flex min-h-16 shrink-0 flex-col pt-3">
+          <div
+            onPointerDown={(e) => dragControls.start(e)}
+            className="absolute left-1/2 top-0 flex h-7 w-24 -translate-x-1/2 cursor-grab touch-none items-center justify-center active:cursor-grabbing"
+          >
             <Grabber />
           </div>
           <div className="flex h-12 items-center justify-between px-4">
@@ -150,18 +179,18 @@ export function AIChatSheet({
           </div>
         </div>
 
-        {/* Body */}
-        <div className="flex flex-col gap-4 p-4">
+        {/* Body — scrolls independently; dragging here never drags the sheet. */}
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
           {/* Marketing chips (decorative, per the node). */}
           <div className="flex items-start gap-2">
             <span className="flex items-center gap-1.5 rounded-full bg-pro-on px-3 py-2">
               <span className="rounded-[4px] bg-pro px-1 text-[9px] font-black leading-[14px] text-pro-on">
                 PRO
               </span>
-              <span className="text-[14px] font-bold leading-4 text-pro">Mejorar</span>
+              <span className="text-[14px] font-bold leading-4 text-pro">{t.chatUpgrade}</span>
             </span>
             <span className="rounded-full bg-brand-subtle px-3 py-2 text-[14px] font-bold leading-4 text-brand">
-              Hecho a tu medida
+              {t.chatBuiltForYou}
             </span>
           </div>
 
@@ -174,7 +203,7 @@ export function AIChatSheet({
           {/* Chat input — a static affordance (the recall AI is mocked). */}
           <div className="flex h-12 items-center gap-2 rounded-full bg-surface pl-4 pr-2">
             <span className="flex-1 text-[18px] leading-6 tracking-[0.18px] text-ink-3">
-              ¿Y qué hay de…?
+              {t.chatInputPlaceholder}
             </span>
             <span className="flex h-8 w-8 items-center justify-center text-ink-2" aria-hidden>
               <MicIcon size={24} />
