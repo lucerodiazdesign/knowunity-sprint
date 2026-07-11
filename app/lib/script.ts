@@ -1,7 +1,7 @@
 // ============================================================
-// Deterministic mock script — History set (feudal system + WWI + Industrial
-// Revolution). THIS IS A MOCK: no STT, no audio, no model, no API. Each take's
-// judged result is fixed so behaviour is identical every run.
+// Deterministic mock script — Science set (water cycle + photosynthesis +
+// states of matter). THIS IS A MOCK: no STT, no audio, no model, no API. Each
+// take's judged result is fixed so behaviour is identical every run.
 //
 // Per-term loop (ONE shared machine for every term, 3–5/session):
 //   attempt 1 → SEND → processing → verdict
@@ -59,140 +59,140 @@ export interface Term {
 // there to switch the whole app, this content included.
 const TERMS_ES: Term[] = [
   {
-    id: "feudal-system",
-    subject: "Historia",
-    title: "El sistema feudal",
+    id: "water-cycle",
+    subject: "Ciencias",
+    title: "El ciclo del agua",
     prompt:
-      "Explica el sistema feudal con tus propias palabras: ¿qué relación había entre señores y vasallos, y qué obtenía cada parte?",
+      "Explica el ciclo del agua con tus propias palabras: ¿cómo se mueve el agua entre los océanos, el aire y la tierra?",
     themes: [
-      "Se concedían tierras a cambio de lealtad",
-      "Los vasallos debían servicio militar (caballeros)",
-      "Los siervos trabajaban la tierra a cambio de protección",
+      "La evaporación eleva el agua al aire como vapor",
+      "La condensación forma las nubes",
+      "La precipitación la devuelve como lluvia o nieve",
     ],
     partialCovered: 3,
     hint: "",
     fullAnswer:
-      "El feudalismo era un sistema medieval basado en la tierra y la lealtad. Un monarca concedía tierras (un feudo) a los señores, que se convertían en vasallos y le debían servicio militar y fidelidad a cambio. Los campesinos y siervos trabajaban esa tierra a cambio de protección. Las obligaciones subían por la jerarquía; la tierra y la protección bajaban.",
+      "El ciclo del agua es cómo el agua se mueve continuamente entre los océanos, el aire y la tierra. El sol calienta el agua de la superficie y esta se evapora en vapor; el vapor sube, se enfría y se condensa en nubes; cuando las gotas se vuelven pesadas caen como precipitación (lluvia o nieve); y esa agua se acumula en ríos, lagos y océanos —o se filtra en el suelo— antes de evaporarse de nuevo.",
     // First take nails it → unaided pass.
     attempt1Result: "pass",
     attempt2Result: "pass",
     attempt1Transcript:
-      "Era un sistema donde el rey daba tierras a los señores, y a cambio los señores —los vasallos— juraban lealtad y prestaban servicio militar, como aportar caballeros. Los campesinos trabajaban la tierra a cambio de protección. Así que básicamente se intercambiaba tierra por lealtad y servicio, arriba y abajo en la jerarquía.",
+      "El agua de los océanos y los lagos se evapora cuando el sol la calienta, así que se convierte en vapor y sube. Arriba se enfría y se condensa en nubes, y cuando las gotas pesan mucho caen como lluvia o nieve. Después corre hacia los ríos y vuelve al mar, y todo se repite.",
     attempt2Transcript: "",
   },
   {
-    id: "causes-ww1",
-    subject: "Historia",
-    title: "Las causas de la Primera Guerra Mundial",
+    id: "photosynthesis",
+    subject: "Ciencias",
+    title: "La fotosíntesis",
     prompt:
-      "Explica las principales causas de la Primera Guerra Mundial: ¿qué llevó realmente a Europa a la guerra en 1914?",
+      "Explica la fotosíntesis: ¿qué toma la planta, qué produce y qué necesita para hacerlo?",
     themes: [
-      "El asesinato de Francisco Fernando fue la chispa",
-      "Las alianzas rivales arrastraron a los países",
-      "Las causas de fondo (M.A.I.N.) crearon la tensión",
+      "Usa la energía del sol captada por la clorofila",
+      "Toma dióxido de carbono y agua",
+      "Produce glucosa (alimento) y libera oxígeno",
     ],
     partialCovered: 1,
-    hint: "Ya tienes la chispa: el asesinato de 1914. Pero piensa en los años de tensión previos. ¿Qué sistemas rivales tenían a Europa en un pulso?",
+    hint: "Ya tienes que las plantas usan la luz del sol para hacer alimento. Pero ¿qué TOMAN para fabricar ese alimento y qué liberan como subproducto?",
     fullAnswer:
-      "Las causas de fondo de la Primera Guerra Mundial se resumen en M.A.I.N.: Militarismo (una carrera armamentística), Alianzas (dos bloques rivales: la Triple Entente y la Triple Alianza), Imperialismo (competencia por las colonias) y Nacionalismo (ambiciones rivales, sobre todo en los Balcanes). El asesinato del archiduque Francisco Fernando en Sarajevo, en junio de 1914, fue el detonante inmediato que puso en marcha las alianzas.",
+      "La fotosíntesis es cómo las plantas fabrican su propio alimento. En las hojas, la clorofila capta la energía de la luz del sol. La planta toma dióxido de carbono del aire y agua de sus raíces, y usa la energía de la luz para convertirlos en glucosa (azúcar) como alimento, liberando oxígeno como subproducto.",
     // T2: partial on both passes → queued, then answer revealed → revealed.
     attempt1Result: "partial",
     attempt2Result: "partial",
     attempt1Transcript:
-      "Había mucha tensión entre los países, y luego asesinaron a alguien importante, así que estalló la guerra.",
+      "Es cómo las plantas hacen su alimento usando la luz del sol. Usan la energía del sol para crecer.",
     attempt2Transcript:
-      "Eh… había alianzas entre los países, ¿y el asesinato lo desencadenó?",
+      "Eh… ¿las plantas usan la luz del sol y algo del aire para hacer alimento?",
   },
   {
-    id: "industrial-revolution",
-    subject: "Historia",
-    title: "La Revolución Industrial",
+    id: "states-of-matter",
+    subject: "Ciencias",
+    title: "Los estados de la materia",
     prompt:
-      "Explica la Revolución Industrial: ¿qué cambió y por qué empezó en Gran Bretaña?",
+      "Explica los tres estados principales de la materia: ¿en qué se diferencian los sólidos, los líquidos y los gases, y qué cambia entre ellos?",
     themes: [
-      "Las máquinas y las fábricas sustituyeron la producción manual",
-      "El carbón y el hierro de Gran Bretaña la impulsaron",
-      "El capital del comercio y el imperio la financió",
+      "Los sólidos mantienen una forma fija (partículas juntas que solo vibran)",
+      "Los líquidos fluyen y toman la forma de su recipiente",
+      "Los gases se expanden para llenar cualquier espacio; el calor cambia el estado",
     ],
     partialCovered: 0,
-    hint: "Piensa en lo que Gran Bretaña tenía en abundancia, bajo tierra, para mover todas esas máquinas nuevas, y adónde se mudaba la gente para hacerlas funcionar.",
+    hint: "Piensa en las partículas: qué tan juntas están y con qué libertad se mueven en un sólido, un líquido y un gas, y qué hace añadir o quitar calor.",
     fullAnswer:
-      "La Revolución Industrial (c. 1760–1840) fue el paso de la producción manual a la fabricación con máquinas en fábricas. Empezó en Gran Bretaña gracias a la abundancia de carbón y hierro, al capital del comercio y el imperio, a inventos clave (la máquina de vapor, las máquinas de hilar y tejer) y a una mano de obra que se trasladaba a ciudades industriales en rápido crecimiento.",
+      "La materia tiene tres estados principales: sólido, líquido y gas. En un sólido, las partículas están muy juntas y solo vibran, así que mantiene una forma y un volumen fijos. En un líquido, las partículas están cerca pero pueden deslizarse unas sobre otras, así que fluye y toma la forma de su recipiente. En un gas, las partículas están muy separadas y se mueven libremente, expandiéndose para llenar cualquier espacio. Añadir calor lleva la materia de sólido → líquido → gas; quitar calor lo invierte.",
     // T3: fail on both passes → queued, then answer revealed → revealed.
     attempt1Result: "fail",
     attempt2Result: "fail",
     attempt1Transcript:
-      "Es cuando se inventaron las fábricas y las máquinas y la gente empezó a fabricar mucho más.",
+      "Están el sólido, el líquido y el gas. El hielo es sólido, el agua es líquida y el vapor es gas.",
     attempt2Transcript:
-      "Se fabricaba mucho más en fábricas con máquinas, y pasó en Gran Bretaña porque se les daba bien el comercio.",
+      "Los sólidos son duros, los líquidos son mojados y los gases flotan por ahí, creo.",
   },
 ];
 
 const TERMS_EN: Term[] = [
   {
-    id: "feudal-system",
-    subject: "History",
-    title: "The feudal system",
+    id: "water-cycle",
+    subject: "Science",
+    title: "The water cycle",
     prompt:
-      "Explain the feudal system in your own words — what was the relationship between lords and vassals, and what did each side get out of it?",
+      "Explain the water cycle in your own words — how does water move between the oceans, the air, and the land?",
     themes: [
-      "Land granted in exchange for loyalty",
-      "Vassals owed military service (knights)",
-      "Serfs worked the land for protection",
+      "Evaporation lifts water into the air as vapor",
+      "Condensation forms clouds",
+      "Precipitation returns it as rain or snow",
     ],
     partialCovered: 3,
     hint: "",
     fullAnswer:
-      "Feudalism was a medieval system built on land and loyalty. A monarch granted land (a fief) to lords, who became vassals owing military service and allegiance in return. Peasants and serfs worked that land in exchange for protection. Duties flowed up the hierarchy; land and protection flowed down.",
+      "The water cycle is how water moves continuously between the oceans, the air, and the land. The sun heats surface water so it evaporates into vapor; the vapor rises, cools, and condenses into clouds; when the droplets grow heavy they fall as precipitation (rain or snow); and that water collects in rivers, lakes, and oceans — or soaks into the ground — before evaporating again.",
     attempt1Result: "pass",
     attempt2Result: "pass",
     attempt1Transcript:
-      "It was a system where the king gave land to lords, and in return the lords — the vassals — swore loyalty and gave military service, like providing knights. Peasants worked the land in exchange for protection. So basically land was traded for loyalty and service up and down the ranks.",
+      "Water from the oceans and lakes evaporates when the sun heats it, so it turns into vapor and rises. Up high it cools and condenses into clouds, and when the drops get heavy they fall back down as rain or snow. Then it runs off into rivers and back to the sea, and the whole thing repeats.",
     attempt2Transcript: "",
   },
   {
-    id: "causes-ww1",
-    subject: "History",
-    title: "Causes of World War I",
+    id: "photosynthesis",
+    subject: "Science",
+    title: "Photosynthesis",
     prompt:
-      "Explain the main causes of World War I — what actually tipped Europe into war in 1914?",
+      "Explain photosynthesis — what does a plant take in, what does it make, and what does it need to do it?",
     themes: [
-      "The assassination of Franz Ferdinand was the spark",
-      "Rival alliances dragged countries in",
-      "Long-term M.A.I.N. causes built the tension",
+      "Uses sunlight energy captured by chlorophyll",
+      "Takes in carbon dioxide and water",
+      "Makes glucose (food) and releases oxygen",
     ],
     partialCovered: 1,
-    hint: "You've got the spark — the assassination in 1914. But think about the years of build-up before it. What rival systems had Europe locked into a standoff?",
+    hint: "You've got that plants use sunlight to make food. But what do they take IN to build that food, and what do they give off as a by-product?",
     fullAnswer:
-      "WWI's long-term causes are summed up as M.A.I.N.: Militarism (an arms race), Alliances (two rival blocs — the Triple Entente and Triple Alliance), Imperialism (competition for colonies), and Nationalism (rival ambitions, especially in the Balkans). The assassination of Archduke Franz Ferdinand in Sarajevo in June 1914 was the immediate trigger that set the alliances in motion.",
+      "Photosynthesis is how plants make their own food. In the leaves, chlorophyll captures energy from sunlight. The plant takes in carbon dioxide from the air and water from its roots, and uses the light energy to turn them into glucose (sugar) for food — releasing oxygen as a by-product.",
     attempt1Result: "partial",
     attempt2Result: "partial",
     attempt1Transcript:
-      "There was a lot of tension between countries, and then someone important got assassinated, so war broke out.",
+      "It's how plants make their food using sunlight. They use the sun's energy to grow.",
     attempt2Transcript:
-      "Um… there were alliances between countries, and the assassination kicked it off?",
+      "Um… plants use sunlight and something from the air to make food?",
   },
   {
-    id: "industrial-revolution",
-    subject: "History",
-    title: "The Industrial Revolution",
+    id: "states-of-matter",
+    subject: "Science",
+    title: "States of matter",
     prompt:
-      "Explain the Industrial Revolution — what changed, and why did it start in Britain?",
+      "Explain the three main states of matter — how are solids, liquids, and gases different, and what changes between them?",
     themes: [
-      "Machines and factories replaced hand production",
-      "Britain's coal and iron powered it",
-      "Capital from trade and empire funded it",
+      "Solids keep a fixed shape (particles packed, only vibrating)",
+      "Liquids flow and take their container's shape",
+      "Gases spread to fill any space; heat changes the state",
     ],
     partialCovered: 0,
-    hint: "Think about what Britain had loads of, right in the ground, to power all those new machines — and where people moved to run them.",
+    hint: "Think about the particles — how tightly packed and how freely they move in a solid vs a liquid vs a gas — and what adding or removing heat does.",
     fullAnswer:
-      "The Industrial Revolution (c. 1760–1840) was the shift from hand production to machine manufacturing in factories. It began in Britain thanks to abundant coal and iron, capital from trade and empire, key inventions (the steam engine, spinning and weaving machines), and a workforce moving into fast-growing industrial cities.",
+      "Matter has three main states: solid, liquid, and gas. In a solid, particles are packed tightly and only vibrate, so it keeps a fixed shape and volume. In a liquid, particles are close but can slide past each other, so it flows and takes the shape of its container. In a gas, particles are far apart and move freely, spreading to fill any space. Adding heat moves matter from solid → liquid → gas; removing heat reverses it.",
     attempt1Result: "fail",
     attempt2Result: "fail",
     attempt1Transcript:
-      "It's when factories and machines got invented and people started making a lot more stuff.",
+      "There's solid, liquid, and gas. Ice is solid, water is liquid, and steam is gas.",
     attempt2Transcript:
-      "Loads more got made in factories with machines, and it happened in Britain because they were good at trade.",
+      "Solids are hard, liquids are wet, and gases float around, I think.",
   },
 ];
 

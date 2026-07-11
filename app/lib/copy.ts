@@ -22,12 +22,12 @@ export const sttLocale = STT_LOCALE[LANG];
 
 const en = {
   // ---- Exam Plan path ----
-  subject: "History",
+  subject: "Science",
   changeSubject: "Change subject",
   more: "More",
   weekLeft: "1 week",
   goal: "Goal: 12.5",
-  currentTopic: "Feudal System",
+  currentTopic: "The Water Cycle",
   pathKeyConcepts: "Key Concepts",
   pathErrorAnalysis: "Error Analysis",
   pathFinalReview: "Final Review and Connections",
@@ -112,7 +112,7 @@ const en = {
   backToVoice: "Back to voice",
 
   // ---- AI Chat ----
-  chatTitle: "History 101",
+  chatTitle: "Science 101",
   chatHeading: "What's missing?",
   chatUpgrade: "Upgrade",
   chatBuiltForYou: "Built around you",
@@ -127,12 +127,12 @@ type Dict = typeof en;
 
 const es: Dict = {
   // ---- Exam Plan path ----
-  subject: "Historia",
+  subject: "Ciencias",
   changeSubject: "Cambiar asignatura",
   more: "Más",
   weekLeft: "1 semana",
   goal: "Meta: 12,5",
-  currentTopic: "Sistema Feudal",
+  currentTopic: "El ciclo del agua",
   pathKeyConcepts: "Conceptos Clave",
   pathErrorAnalysis: "Análisis de Errores",
   pathFinalReview: "Revisión Final y Conexiones",
@@ -217,7 +217,7 @@ const es: Dict = {
   backToVoice: "Volver a la voz",
 
   // ---- AI Chat ----
-  chatTitle: "Historia 101",
+  chatTitle: "Ciencias 101",
   chatHeading: "¿Qué te falta?",
   chatUpgrade: "Mejorar",
   chatBuiltForYou: "Hecho a tu medida",

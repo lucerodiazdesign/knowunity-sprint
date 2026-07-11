@@ -59,9 +59,27 @@ export function RecallScreen({
   const recording = phase === "recording";
   const hasTake = phase === "review";
 
-  // Progress = terminally-resolved terms only ("pending_retry" is still in flight).
-  const resolved = state.results.filter((r) => r && r !== "pending_retry").length;
-  const progress = resolved / TERMS.length;
+  // Progress — parametric credit model (session length N varies; nothing is
+  // hardcoded). Full slice = 1/N per term, where N = the terms in THIS session
+  // (the pass-1 stops, so a TRY_MISSED subset still reaches 100%).
+  //   unaided_pass                       → full slice (passed on the first try)
+  //   pending_retry (missed → queued)    → HALF the slice, credited immediately
+  //   passed_with_hints / revealed       → the remaining half (resolved in Pass 2)
+  //   skipped / not-yet-attempted        → 0
+  // Completion model: pass, passed_with_hints AND auto-revealed all fill the
+  // remaining half, so the bar reaches 100% once every term is resolved and
+  // visibly advances as the Pass-2 queue drains. Derived purely from existing
+  // per-term state — no machine changes. (CLAUDE.md doesn't specify the bar
+  // should stop short on reveal, so the completion default stands.)
+  const sessionTermIdxs = state.stops.filter((s) => s.pass === 1).map((s) => s.termIdx);
+  const N = Math.max(1, sessionTermIdxs.length);
+  const slice = 1 / N;
+  const progress = sessionTermIdxs.reduce((acc, idx) => {
+    const r = state.results[idx];
+    if (r === "unaided_pass" || r === "passed_with_hints" || r === "revealed") return acc + slice;
+    if (r === "pending_retry") return acc + slice / 2;
+    return acc; // skipped / undefined → 0
+  }, 0);
 
   // ---- Replay playback (audio-synced waveform) ----
   const audioRef = useRef<HTMLAudioElement>(null);

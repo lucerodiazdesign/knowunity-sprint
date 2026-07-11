@@ -19,9 +19,13 @@ export function Processing({ prompt, transcript }: { prompt: string; transcript:
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden">
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-2">
-        {/* One conversation turn (gap 16, per Figma): Knowie's question stays on
-            top (left-aligned), the student's answer stacks below (right-aligned). */}
+      {/* Conversation turn + thinking line flow in ONE flex column with a single
+          16px (space-400) gap, so the thinking text sits directly below the
+          transcript regardless of answer length — no absolute offsets / fixed
+          491px pin, no hardcoded margin. */}
+      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pt-2">
+        {/* One conversation turn: Knowie's question stays on top (left-aligned),
+            the student's answer stacks below (right-aligned). */}
         <div className="flex flex-col gap-4">
           {/* Knowie's question — persists, left-aligned with a tail. */}
           <div className="relative">
@@ -46,8 +50,9 @@ export function Processing({ prompt, transcript }: { prompt: string; transcript:
           </div>
         </div>
 
-        {/* Knowie's thinking line, with a looping ellipsis. */}
-        <h2 className="mt-6 max-w-[240px] text-[28px] font-extrabold leading-[30px] tracking-[-0.2px] text-ink">
+        {/* Knowie's thinking line — in flow, 16px below the transcript via the
+            column's gap-4 token (no hardcoded margin). */}
+        <h2 className="max-w-[240px] text-[28px] font-extrabold leading-[30px] tracking-[-0.2px] text-ink">
           {t.thinking}
           <Dots animate={!reduce} />
         </h2>
