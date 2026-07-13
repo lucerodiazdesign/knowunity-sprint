@@ -155,7 +155,7 @@ export function PathScreen({
           {/* Final-review section header — thin centered divider. */}
           <div className="my-4 flex w-full items-center gap-3">
             <span className="h-px flex-1 bg-border" />
-            <span className="whitespace-nowrap text-[13px] font-bold tracking-[0.1px] text-ink-3">
+            <span className="whitespace-nowrap text-[13px] font-bold tracking-[0.1px] text-ink-2">
               {t.pathFinalReview}
             </span>
             <span className="h-px flex-1 bg-border" />

@@ -16,8 +16,8 @@ The full spec lives in [sprint-context.md](sprint-context.md) — read it before
 
 Per-term loop: **Idle → Record (push-to-talk) → Review take → explicit Send → Processing → Verdict beat → branch**.
 - `unaided_pass` → short affirmation → **auto-advance** to next term.
-- Miss/partial → **2–3s pause**, then Hint 1 fades in → CTAs **Next** (primary) / **See answer** (ghost).
-- Session-level: every non-`unaided_pass` term is re-presented in an **end-of-session retry queue**. Second miss → Hint 2 → third miss → answer **auto-reveals** (no tap).
+- **Attempt-1 miss** (partial OR fully-wrong) → verdict appears inline, then **Hint 1** as a covered "Little Hint" card the student **taps to reveal** (the tap is the forced-retrieval gate; the earlier timed 2–3s reveal is off in the UI — kept in code, not applied to any design).
+- Session-level: every non-`unaided_pass` term is re-presented in an **end-of-session retry queue** (**attempt 2**). A non-correct retry → **answer auto-reveals** (fail answer reveal, no tap); correct → `passed_with_hints`. **There is no Hint 2.**
 - Ends in a **Summary** (per-term breakdown + unaided count → Continue/Try again).
 
 ## Load-bearing design invariants
@@ -25,8 +25,8 @@ Per-term loop: **Idle → Record (push-to-talk) → Review take → explicit Sen
 These are decisions, not suggestions — violating them breaks the product intent:
 
 - **Four terminal states only:** `unaided_pass`, `passed_with_hints`, `revealed`, `skipped`. There is **no `fail` state** — "fail" is a transient verdict that drives copy and never persists.
-- **Verdict and hint are two separate beats, ~2–3s apart.** The gap is a deliberate forced-retrieval window (generation effect), *not* a loading delay. Never render Next/See-answer CTAs during the pause.
-- **Hints distribute across the session:** Hint 1 on first miss (main pass), Hint 2 at the retry queue. Do not stack both hints in one turn.
+- **The hint is a deliberate forced-retrieval gate (generation effect), *not* a loading delay.** On an **attempt-1 miss** (partial OR fail) the hint is delivered inline as a covered "Little Hint" card the student **taps to reveal** — the tap *is* the gate (it replaced the earlier timed ~2–3s pause). Never show the attempt-1 hint text pre-revealed. (The attempt-2 answer reveal still renders in the result sheet.)
+- **Hint 1 is the only hint:** shown on the **attempt-1 miss** (main pass) as a covered tap-to-reveal card. **There is no Hint 2** — a non-correct retry (attempt 2) goes straight to the answer reveal.
 - **Retry-queue second-miss reveal is automatic** (Knowie steps in, no tap). The main-pass "See answer" ghost is a *separate* opt-in — keep both.
 - **Push-to-talk requires an explicit Send:** stop → review → Send. No auto-endpointing / speech-end detection.
 - **`unaided_pass` auto-advances** (short hold, tap to skip); all other states wait on a CTA.
@@ -49,8 +49,10 @@ No TTS / voice output (Knowie never speaks). No auto-endpointing. No open Q&A / 
 Entry node → soft-gate intro (first encounter only) → per-term loop → end-of-session retry queue → summary → return to path.
 - Per-term loop: idle → recording (push-to-talk) → processing → result.
 - Result has THREE faces: unaided_pass / partial+hint / (on 2nd miss) reveal. - user can always reveal (‘why’ button) when the result appears
-- Two-beat partial: verdict appears FIRST, then Hint 1 fades in 2–3s later. 
-That delay is the core mechanic — never skip it, never show hint instantly.
+- Partial verdict: the verdict (heading + what-you-covered) appears in a Knowie
+bubble; the hint sits below as a covered "Little Hint" card. **Tap-to-reveal is
+the core forced-retrieval mechanic** — the hint text stays hidden until the
+student taps. (Replaces the earlier timed 2–3s reveal.)
 - Platform: mobile only, 390px wide. Dark mode only.
 
 ## This is a test prototype, not a working AI   (read this first)
@@ -95,6 +97,8 @@ That delay is the core mechanic — never skip it, never show hint instantly.
 
 ## Where things live (point, don't paste)
 - sprint-context.md · design.md · SPEC.md · prototype-rules.md · motion-guide.md
+- feedback.md : my prioritized fix-list from user testing. Read it before making
+  fixes; change what it lists; protect anything marked as working.
 - reference/ : screenshots of real Knowunity screens (sample UI to match)
 - public/images : mascot, avatars
 

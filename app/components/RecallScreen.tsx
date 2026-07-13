@@ -194,7 +194,7 @@ export function RecallScreen({
         {/* Answer waveform + helper. */}
         <div className="flex w-full flex-col items-center">
           <Waveform mode={waveMode} progress={playProgress} />
-          <p className="text-[12px] font-medium leading-4 tracking-[0.12px] text-ink-3">{helper}</p>
+          <p className="text-[12px] font-medium leading-4 tracking-[0.12px] text-ink-2">{helper}</p>
         </div>
       </div>
 

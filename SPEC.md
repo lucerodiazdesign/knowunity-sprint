@@ -142,19 +142,25 @@ States and transitions:
    shimmer). Mocked delay **≈1.5s** (target <4s). Mirrors the app's multi-step generating screen.
 5. **Verdict beat** — the verdict copy appears **alone**, nothing else on screen (pass / not-quite). This is a
    **separate beat** from any hint.
-6. **Branch:**
+6. **Branch — attempt 1 (the main pass):**
    - **`unaided_pass`** → short affirmation from Knowie → **auto-advance** after a short hold (~1.8s, tap to
      skip the hold) to the next term. No CTA, no hint.
-   - **Miss / partial** → hold the verdict alone for a **~2.5s pause** (a deliberate forced-retrieval window —
-     **never render CTAs or the hint during this pause**), then **Hint 1** fades in below the verdict. CTAs
-     appear with the hint: **Next** (primary) and **See answer** (ghost).
+   - **Miss** — a **partial** OR a **fully-wrong** answer → the verdict appears **inline** in a Knowie bubble
+     with **Hint 1** below as a covered **"Little Hint"** card; the student **taps to reveal** the hint text in
+     place — the tap is the deliberate forced-retrieval gate (it replaced the earlier timed ~2.5s pause).
+     Partial and fully-wrong share this same inline-hint treatment, differing only in the heading
+     (**"Almost there!"** vs **"Not quite"**) and whether a *what-you-covered* checkmark list is shown (partial:
+     yes; fully-wrong: none). **`partial` is an attempt-1 verdict only.** CTAs below: **Next** (primary) /
+     **See answer** (ghost).
      - **Next** → term is queued into the **end-of-session retry queue**; advance to next term.
-     - **See answer** → opens the **AI-chat reveal drawer** (§8), locks **`revealed`**, advances on drawer dismiss.
-7. **Retry queue** (after all terms have had their main pass): every non-`unaided_pass` term is re-presented on
-   the same Recall screen. On a miss here, **Hint 2** is shown (Hint 1 and Hint 2 never stack in one turn —
-   Hint 1 lives in the main pass, Hint 2 in the retry). If the student misses **again**, the answer
-   **auto-reveals** — **Knowie steps in, no tap** — via the reveal drawer, locking **`revealed`**. If they pass
-   on the retry, lock **`passed_with_hints`**.
+     - **See answer** → opens the answer reveal (§8), locks **`revealed`**, advances.
+7. **Retry queue — attempt 2** (after all terms have had their main pass): every non-`unaided_pass` term is
+   re-presented on the same Recall screen and the student records **once more**. This is the **final** attempt:
+   - **Correct** → lock **`passed_with_hints`** (result sheet, pass styling).
+   - **Any non-correct result** → **FAIL + answer reveal** in the **result sheet**: a **"Not quite"** header
+     over an **Answer card** holding Knowie's full written answer, locking **`revealed`**. **There is no
+     `partial` verdict on attempt 2.** Two variants: **some-right** — the *what-you-covered* checkmark list
+     **above** the Answer card; **all-wrong** — the Answer card only.
 8. After the retry queue clears → push to **Summary**.
 
 **Progress / XP:** XP **counts up per term** on the screen but is **collected only on completion** (the
@@ -165,8 +171,9 @@ Summary's Continue). Skip is reachable in every state that has a mic; it logs `s
 ## 6. Invariants (must hold — from CLAUDE.md / sprint-context)
 
 - Four terminal states only; **no persisted `fail`**.
-- Verdict and hint are **two separate beats ~2–3s apart**; no CTAs during the pause.
-- Hints distribute: **Hint 1 main pass, Hint 2 retry queue** — never both in one turn.
+- On an **attempt-1 miss** (partial OR fully-wrong) the hint is a covered **"Little Hint"** card revealed by **tap** (the deliberate forced-retrieval gate). **`partial` is an attempt-1 verdict only.**
+- On **attempt 2**, any non-correct result resolves to **FAIL + answer reveal** in the result sheet — two variants: *some-right* (what-you-covered list + answer) and *all-wrong* (answer only). Correct on attempt 2 → `passed_with_hints`.
+- **Hint 1** is the attempt-1 miss hint (main pass). Attempt 2 shows **no hint** — a non-correct retry goes straight to the **answer reveal**. (Supersedes the earlier "Hint 2 on the retry" model.)
 - Retry-queue second-miss reveal is **automatic**; the main-pass "See answer" is a **separate opt-in** — keep both.
 - Push-to-talk needs an **explicit Send**; no auto-endpointing / speech-end detection.
 - `unaided_pass` **auto-advances**; all other states wait on a CTA.
@@ -185,8 +192,8 @@ encouraging, never harsh even on a miss. Full answers are stored for every term 
 
 ### Scripted path (what a tester experiences)
 - **Term 1 — Photosynthesis → `unaided_pass`.** First take passes; short affirmation; auto-advances.
-- **Term 2 — Osmosis → `revealed`.** First take misses → Hint 1 → tester taps **Next** → re-presented in the
-  retry queue → misses again → Hint 2 → misses → **auto-reveal** (Knowie steps in).
+- **Term 2 — Osmosis → `revealed`.** First take misses → Hint 1 (tap to reveal) → tester taps **Next** →
+  re-presented in the retry queue → misses again → **FAIL answer reveal** (Knowie steps in). No Hint 2.
 - **Term 3 — Mitosis → `passed_with_hints`.** First take misses → Hint 1 → tester taps **Next** → re-presented
   in the retry queue → **passes** on the retry.
 - **Skip** is present and functional as an always-visible control on every term, but no scripted term ends
@@ -211,10 +218,8 @@ encouraging, never harsh even on a miss. Full answers are stored for every term 
 - **Hint 1:** *"Think about which way the water moves — and what it's moving toward."*
 - (Tester taps **Next** → retry queue.)
 - Canned transcript (retry, still miss): *"Water moves to the side that has more stuff dissolved in it?"*
-- **Hint 2:** *"It moves from where there's more water to where there's less — down its concentration gradient,
-  and it needs no energy."*
-- (Still miss → **auto-reveal**, Knowie steps in.)
-- Full answer (shown in drawer): *"Osmosis is the movement of water across a semipermeable membrane from a
+- (Non-correct on attempt 2 → **FAIL answer reveal**, Knowie steps in — no Hint 2.)
+- Full answer (shown in the result sheet's Answer card): *"Osmosis is the movement of water across a semipermeable membrane from a
   region of higher water concentration (lower solute) to lower water concentration (higher solute), until both
   sides balance. It's passive — no energy required."*
 
@@ -273,9 +278,12 @@ Reuse design.md §6 patterns before inventing anything.
 judge error, which we are **not** building). Misses use `questioning`/`confused`/`determined`, never a harsh face.
 - **Text-fallback sheet:** slides up from bottom (`sheet` spring, `y:"100%"→0`), grabber handle, text input +
   Send. Submitting runs the identical processing→verdict→hint ladder and terminal states as voice.
-- **AI-chat reveal drawer:** bottom sheet styled like the AI chat surface, presenting Knowie's full written
-  answer as a message + a Continue/Got it CTA that advances. Used for both the opt-in "See answer" and the
-  automatic retry reveal; the only difference is the trigger (tap vs auto).
+- **Answer reveal (attempt-2 FAIL):** rendered in the **result sheet** — a **"Not quite"** header
+  (feedback/error, Headline M, header icon + thumbs) over an **Answer card** (stacking surface, 2px border
+  `rgba(244,242,255,0.5)`, `Radius/600`, `Space/400` padding) holding the **Answer** label + Knowie's full
+  written answer (Body S Regular), with **Why?** + **Got it** (feedback/error) CTAs. Two variants:
+  **some-right** shows the *what-you-covered* checkmark list above the card; **all-wrong** shows the card only.
+  Reached via the opt-in **See answer** or the automatic attempt-2 reveal (same sheet; only the trigger differs).
 
 ---
 
@@ -313,11 +321,11 @@ Verify the finished prototype against every line.
 - [ ] Mic is **tap-to-start / tap-to-stop**; recording state is unmistakable (pulse + shape/label, not color
       alone); nothing is judged before **Send**.
 - [ ] Processing is a **staged/animated** state (not a spinner), ≈1.5s.
-- [ ] Verdict appears **alone**; on a miss there's a **~2.5s pause with no CTAs/hint**, then **Hint 1** fades in
-      with **Next** + **See answer**.
+- [ ] Verdict appears in its bubble; on a **partial** the hint is a covered **"Little Hint"** card revealed by
+      **tap** (no timed pause), with **Next** + **See answer** below.
 - [ ] `unaided_pass` **auto-advances** (short hold, tap to skip); all other states wait on a CTA.
-- [ ] **Retry queue** re-presents every non-`unaided_pass` term; shows **Hint 2** (never stacked with Hint 1);
-      second miss **auto-reveals** with no tap.
+- [ ] **Retry queue (attempt 2)** re-presents every non-`unaided_pass` term; a non-correct retry → **FAIL
+      answer reveal** (some-right / all-wrong variants), no Hint 2.
 - [ ] Both reveal paths exist: main-pass **"See answer"** opt-in **and** retry-queue **automatic** reveal, both
       via the **AI-chat drawer**, both locking `revealed`.
 - [ ] Exactly the **four terminal states** are used (`unaided_pass`, `passed_with_hints`, `revealed`,

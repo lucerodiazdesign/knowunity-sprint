@@ -55,8 +55,8 @@ const en = {
 
   // ---- Record screen ----
   knowieAskAlt: "Knowie waiting, ready for you to speak",
-  erase: "Erase",
-  replay: "Replay",
+  erase: "Re-record",
+  replay: "Play",
   useText: "Use text",
   send: "Send",
   notRelevant: "Not relevant",
@@ -73,7 +73,7 @@ const en = {
   thinking: "Hmm, give me a second",
 
   // ---- Verdict ----
-  verdictTitle: { pass: "You did it!", partial: "Almost there!", fail: "Not quite", skip: "Skipped!" } as Record<string, string>,
+  verdictTitle: { pass: "Nailed it!", partial: "Almost there!", fail: "Not quite", skip: "Skipped!" } as Record<string, string>,
   verdictPrimaryPass: "Continue",
   verdictPrimaryOther: "Got it",
   sectionLockIn: "Let's lock it in",
@@ -82,6 +82,8 @@ const en = {
   chipAnswer: "Answer",
   chipHint: "Hint",
   youCovered: "You covered",
+  littleHint: "Little Hint",
+  tapToView: "Tap to view",
   why: "Why?",
   undoSkip: "Undo skip",
 
@@ -179,7 +181,7 @@ const es: Dict = {
   thinking: "Mmm, dame un segundo",
 
   // ---- Verdict ----
-  verdictTitle: { pass: "¡Lo lograste!", partial: "¡Casi lo tienes!", fail: "No del todo", skip: "¡Omitido!" },
+  verdictTitle: { pass: "Nailed it!", partial: "¡Casi lo tienes!", fail: "No del todo", skip: "¡Omitido!" },
   verdictPrimaryPass: "Continuar",
   verdictPrimaryOther: "Entendido",
   sectionLockIn: "Vamos a fijarlo",
@@ -188,6 +190,8 @@ const es: Dict = {
   chipAnswer: "Respuesta",
   chipHint: "Pista",
   youCovered: "Cubriste",
+  littleHint: "Pista rápida",
+  tapToView: "Toca para ver",
   why: "¿Por qué?",
   undoSkip: "Deshacer omitir",
 

@@ -96,7 +96,7 @@ export function RecallPathNode({
           <span className="flex items-center justify-center" style={{ width: SIZE * 0.5, height: SIZE * 0.5 }}>
             <Image
               // done uses the white mic; the other states use the coral mic.
-              src={done ? "/images/recall-mic-done.png" : "/images/recall-mic.png"}
+              src={done ? "/images/mic_completed.svg" : "/images/mic.svg"}
               alt=""
               width={48}
               height={48}

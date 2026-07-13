@@ -62,7 +62,6 @@
   --pro-on-bold: #2a1d04;
   --pro-subtle: #3a2d0b;
   --pro-on-subtle: #fcd34d;
-  --hint-yellow: #f0b100; /* yellow/500 — the "Hint" affordance */
 
   /* Borders */
   --border-default: rgba(255, 255, 255, 0.1);
@@ -125,7 +124,6 @@
   --color-pro: var(--pro-bold);
   --color-pro-on: var(--pro-on-bold);
   --color-pro-subtle: var(--pro-subtle);
-  --color-hint: var(--hint-yellow);
 
   --color-border: var(--border-default);
 

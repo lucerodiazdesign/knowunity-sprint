@@ -204,14 +204,20 @@ function reducer(state: MachineState, action: Action): MachineState {
     case "SEND":
       return { ...state, phase: "processing" };
 
-    case "PROCESSING_DONE":
-      // Pass 1 withholds the hint (2-beat); pass 2 (retry) reveals the answer.
+    case "PROCESSING_DONE": {
+      // Attempt 1 keeps the judged result (partial/fail drive the inline hint).
+      // Attempt 2 has NO "partial": any non-correct retry resolves to FAIL (the
+      // answer reveal). Correct on attempt 2 still routes to passed_with_hints
+      // via VERDICT_PRIMARY — this only affects the rendered verdict.
+      const verdictKind =
+        pass === 2 && state.currentResult !== "pass" ? "fail" : state.currentResult;
       return {
         ...state,
         phase: "verdict",
-        verdictKind: state.currentResult,
+        verdictKind,
         hintRevealed: pass === 2,
       };
+    }
 
     case "HINT_REVEAL":
       return { ...state, hintRevealed: true };

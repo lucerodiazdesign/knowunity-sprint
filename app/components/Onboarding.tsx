@@ -64,7 +64,7 @@ function Slide({ artSrc, artAlt, artWidth, artHeight, headline, subtitle }: Slid
         transition={{ ...soft, delay: 0.05 }}
         className="flex flex-col items-center gap-3 pb-2"
       >
-        <h1 className="max-w-[320px] text-center text-[32px] font-extrabold leading-[36px] tracking-[-0.3px] text-ink">
+        <h1 className="max-w-[320px] text-center text-[33px] font-extrabold leading-[36px] tracking-[-0.33px] text-ink">
           {headline}
         </h1>
         <p className="max-w-[280px] text-center text-[18px] font-bold leading-[22px] text-ink-2">

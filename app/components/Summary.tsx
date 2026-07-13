@@ -142,7 +142,7 @@ export function Summary({
         >
           <MascotBubble src={STATE.src} alt={STATE.alt} />
           <div className="flex flex-col items-center gap-2">
-            <h1 className="text-[40px] font-extrabold leading-[42px] tracking-[-0.4px] text-ink">
+            <h1 className="text-[44px] font-extrabold leading-[44px] tracking-[-0.44px] text-ink">
               {STATE.title}
             </h1>
             <p className="max-w-[300px] text-[21px] leading-6 text-ink-2">{STATE.subtitle}</p>
@@ -158,7 +158,7 @@ export function Summary({
             </span>
             <div className="flex w-full items-center justify-center gap-1.5 rounded-md bg-page p-3">
               <BoltIcon size={22} className="text-blue" />
-              <span className="text-[24px] font-bold leading-5 tabular-nums text-blue">{state.xp}</span>
+              <span className="text-[28px] font-bold leading-7 tabular-nums text-blue">{state.xp}</span>
             </div>
           </div>
           {/* SCORE — value is a marked TODO (see SCORE_TODO / report). */}
@@ -168,7 +168,7 @@ export function Summary({
             </span>
             <div className="flex w-full items-center justify-center gap-1.5 rounded-md bg-page p-3">
               <TargetGlyph className="text-green" />
-              <span className="text-[24px] font-bold leading-5 tabular-nums text-green">{SCORE_TODO}</span>
+              <span className="text-[28px] font-bold leading-7 tabular-nums text-green">{SCORE_TODO}</span>
             </div>
           </div>
         </motion.div>
