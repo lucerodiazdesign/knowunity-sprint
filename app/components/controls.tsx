@@ -36,17 +36,12 @@ export function MicButton({
         onClick={onClick}
         disabled={disabled}
         whileTap={{ scale: 0.94 }}
-        animate={
-          recording && !reduce
-            ? { scale: [1, 1.06, 1] }
-            : { scale: 1 }
-        }
-        transition={
-          recording && !reduce
-            ? { duration: 1, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }
-            : snappy
-        }
-        className="relative flex h-[88px] w-[88px] items-center justify-center rounded-full bg-primary text-on-primary shadow-[var(--shadow-button-inset)] disabled:opacity-60"
+        // The live-mic pulse is carried by the radiating ring alone (above); the
+        // button itself stays steady so only ONE thing pulses beside the waveform
+        // — "one thing moving at a time" (motion-guide). Was: scale [1,1.06,1] loop.
+        animate={{ scale: 1 }}
+        transition={snappy}
+        className="relative flex h-[88px] w-[88px] items-center justify-center rounded-full bg-primary text-on-primary shadow-[var(--shadow-mic)] disabled:opacity-60"
         aria-label={recording ? t.stopRecording : t.startRecording}
         aria-pressed={recording}
       >

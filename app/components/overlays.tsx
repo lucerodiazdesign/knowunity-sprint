@@ -42,7 +42,7 @@ function SheetShell({
         animate={reduce ? { opacity: 1 } : { y: 0 }}
         exit={reduce ? { opacity: 0 } : { y: "100%" }}
         transition={sheet}
-        className="relative rounded-t-[24px] bg-page px-6 pt-3 shadow-[var(--shadow-sheet)]"
+        className="relative rounded-t-lg bg-page px-6 pt-3 shadow-[var(--shadow-sheet)]"
         style={{ paddingBottom: "max(24px, env(safe-area-inset-bottom))" }}
       >
         <div className="mb-4 flex justify-center">
@@ -68,14 +68,14 @@ export function TextFallbackSheet({
       <h2 id="text-title" className="text-[18px] font-extrabold leading-[20px] text-ink">
         {t.typeAnswer}
       </h2>
-      <p className="mt-1 text-[13px] text-ink-2">{t.typeAnswerHelp}</p>
+      <p className="mt-1 text-[12px] text-ink-2">{t.typeAnswerHelp}</p>
       <textarea
         autoFocus
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={4}
         placeholder={t.typeAnswerPlaceholder}
-        className="mt-3 w-full resize-none rounded-md bg-surface p-4 text-[15px] leading-[20px] text-ink placeholder:text-ink-3 focus:outline-none"
+        className="mt-3 w-full resize-none rounded-md bg-surface p-4 text-[18px] leading-[24px] text-ink placeholder:text-ink-3 focus:outline-none focus:ring-2 focus:ring-brand"
       />
       <div className="mt-4 flex flex-col gap-2">
         <PillButton onClick={() => onSubmit(text.trim())} disabled={text.trim().length === 0}>
@@ -184,12 +184,12 @@ export function AIChatSheet({
           {/* Marketing chips (decorative, per the node). */}
           <div className="flex items-start gap-2">
             <span className="flex items-center gap-1.5 rounded-full bg-pro-on px-3 py-2">
-              <span className="rounded-[4px] bg-pro px-1 text-[9px] font-black leading-[14px] text-pro-on">
+              <span className="rounded-[4px] bg-pro px-1 text-[9px] font-bold leading-[14px] text-pro-on">
                 PRO
               </span>
-              <span className="text-[14px] font-bold leading-4 text-pro">{t.chatUpgrade}</span>
+              <span className="text-[15px] font-bold leading-4 tracking-[0.15px] text-pro">{t.chatUpgrade}</span>
             </span>
-            <span className="rounded-full bg-brand-subtle px-3 py-2 text-[14px] font-bold leading-4 text-brand">
+            <span className="rounded-full bg-brand-subtle px-3 py-2 text-[15px] font-bold leading-4 tracking-[0.15px] text-brand">
               {t.chatBuiltForYou}
             </span>
           </div>
@@ -197,7 +197,7 @@ export function AIChatSheet({
           {/* Knowie's contextual explanation — seeded from the current term. */}
           <div className="flex flex-col gap-3">
             <p className="text-[15px] font-bold leading-4 tracking-[0.15px] text-ink">{heading}</p>
-            <p className="text-[15px] leading-5 tracking-[0.15px] text-ink">{explanation}</p>
+            <p className="text-[18px] leading-6 tracking-[0.18px] text-ink">{explanation}</p>
           </div>
 
           {/* Chat input — a static affordance (the recall AI is mocked). */}

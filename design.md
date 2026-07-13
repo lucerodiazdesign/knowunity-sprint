@@ -86,7 +86,7 @@ Each has `bold` / `onBold` / `subtle` / `onSubtle`. Bold values:
 | `accent/coral` | `#FB7E5B` | `#512E2C` | Warm accent. |
 | `accent/magenta` | `#E879C0` | `#380D29` | Pink/magenta accent. |
 | `accent/blue` | `#5FA0FC` | `#0A1635` | Blue accent (e.g. "Time" stat). |
-| `accent/green` | `#00C386` | `#0A2E22` | Green accent (e.g. "Perfect"). |
+| `accent/green` | `#00C386` | `#0A2E22` | Green accent (e.g. "Perfect"). `onBold` = `#0A1F18` (dark ground for a pass tag). |
 
 ### Feedback / states
 | Token | Hex | For |
@@ -97,6 +97,7 @@ Each has `bold` / `onBold` / `subtle` / `onSubtle`. Bold values:
 | `feedback/error/bold` | `#FF6B6B` | **Incorrect** (transient verdict only — no persisted `fail` state, per CLAUDE.md). |
 | `feedback/error/subtle` | `#532831` | Error background. |
 | `feedback/error/onSubtle` | `#FCA5A5` | Text on error-subtle. |
+| `feedback/error/onBold` | `#2A0808` | Dark ground for an error tag (bold text on onBold bg). |
 
 ### Pro / premium (gold) — likely out of scope, included for completeness
 `pro/bold` `#F5B53D` · `pro/onBold` `#2A1D04` · `pro/subtle` `#3A2D0B` · `pro/onSubtle` `#FCD34D`.

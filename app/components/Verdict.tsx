@@ -4,9 +4,21 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
 import { CheckIcon, Grabber } from "./icons";
-import { sheet, gentle } from "../lib/motion";
+import { sheet, gentle, snappy, rise } from "../lib/motion";
 import { t } from "../lib/copy";
 import type { VerdictKind } from "../lib/useRecallMachine";
+
+// Inline-miss verdict entrance: Knowie's reply lands a beat after the transcript
+// (fade + small rise, gentle), and the "you covered" checklist staggers in below
+// it. delayChildren sits the list just after the bubble settles.
+const coveredList = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06, delayChildren: 0.28 } },
+};
+const coveredItem = {
+  hidden: { opacity: 0, y: 6 },
+  show: { opacity: 1, y: 0, transition: gentle },
+};
 
 /* ONE shared verdict screen for every term, parametrised by (kind, attempt).
    The transcribed answer renders HERE (post-processing). On attempt 1 partial/
@@ -70,14 +82,17 @@ export function Verdict({
         <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-4 pt-4 pb-6">
           {/* Prompt bubble (Knowie's question). Body S Regular 15/20. */}
           <div className="relative">
-            <div className="absolute -left-[6px] top-4 h-3 w-3 rotate-45 rounded-[2px] bg-surface" aria-hidden />
-            <div className="rounded-md bg-surface p-4 text-[15px] leading-5 tracking-[0.15px] text-ink">{prompt}</div>
+            <div className="absolute -left-[6px] top-5 h-3 w-3 rotate-45 rounded-[2px] bg-surface" aria-hidden />
+            <div className="flex items-start gap-3 rounded-md bg-surface p-3">
+              <Image src="/images/knowie-bubble-3.svg" alt="" aria-hidden width={40} height={40} className="h-10 w-10 shrink-0" />
+              <p className="text-[18px] leading-6 tracking-[0.18px] text-ink">{prompt}</p>
+            </div>
           </div>
           {/* Transcribed answer. Body S Regular 15/20. */}
           <div className="flex justify-end">
-            <div className="flex w-[296px] flex-col gap-1.5 rounded-[18px] rounded-tr-[4px] bg-surface px-3.5 py-3">
+            <div className="flex w-[296px] flex-col gap-1.5 rounded-md rounded-tr-[4px] bg-surface px-3.5 py-3">
               <Waves />
-              <p className="text-[15px] leading-5 tracking-[0.15px] text-ink-2">&ldquo;{transcript}&rdquo;</p>
+              <p className="text-[18px] leading-6 tracking-[0.18px] text-ink-2">&ldquo;{transcript}&rdquo;</p>
             </div>
           </div>
 
@@ -86,7 +101,12 @@ export function Verdict({
               list + Hint. Fail (Figma 13968:14509): "Not quite" + error icon, NO
               checkmark list (showCovered is false for fail), same covered tap-to-
               reveal Hint. The answer is deferred to attempt 2 (SPEC §5) — never here. */}
-          <div className="flex flex-col items-start">
+          <motion.div
+            className="flex flex-col items-start"
+            initial={reduce ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={reduce ? undefined : { ...gentle, delay: 0.15 }}
+          >
             {/* Knowie — separate layer, on top of the bubble's top-left. Fail uses
                 the standby pose; partial uses the excited pose. */}
             <Image
@@ -95,10 +115,15 @@ export function Verdict({
               aria-hidden
               width={105}
               height={47}
-              className="relative z-10 ml-3 h-auto w-[132px]"
+              // The fail (standby) asset draws Knowie ~9px further right in its
+              // canvas than the partial (excited) asset, so it needs a smaller left
+              // margin to nestle into the same top-left-over-the-tail spot.
+              className={`relative z-10 h-[52px] w-auto ${kind === "fail" ? "ml-[3px]" : "ml-3"}`}
             />
-            {/* One surface bubble, with the shared left-side speech tail. */}
-            <div className="relative -mt-3 w-full rounded-md bg-surface p-4">
+            {/* One surface bubble, with the shared left-side speech tail. Anchored
+                flush to the (resized) mascot: mt-0 so Knowie's chin rests just on
+                the bubble's top edge / tail — no gap, no intersection. */}
+            <div className="relative mt-0 w-full rounded-md bg-surface p-3">
               <div className="absolute -left-[6px] top-6 h-3 w-3 rotate-45 rounded-[2px] bg-surface" aria-hidden />
               {/* Heading — Body M Bold 18/24, white. Fail prefixes the "Not quite"
                   error icon (per Figma 13968:14509); partial has no icon. */}
@@ -109,24 +134,29 @@ export function Verdict({
                 <h2 className="text-[18px] font-bold leading-6 tracking-[0.18px] text-ink">{title}</h2>
               </div>
 
-              {/* What the student got right — green circular checkmark list, Body S Regular. */}
+              {/* What the student got right — bullet rows match the "Nailed it!"
+                  (pass) "You covered" list exactly: checkmark_mini.svg @16×16,
+                  gap-1.5 icon→text, gap-2 rows. */}
               {showCovered && covered.length > 0 && (
-                <ul className="mt-3 flex flex-col gap-2">
+                <motion.ul
+                  className="mt-3 flex flex-col gap-2"
+                  variants={reduce ? undefined : coveredList}
+                  initial={reduce ? undefined : "hidden"}
+                  animate={reduce ? undefined : "show"}
+                >
                   {covered.map((c) => (
-                    <li key={c} className="flex items-start gap-2">
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success text-[color:var(--text-inverse)]">
-                        <CheckIcon size={12} strokeWidth={3} />
-                      </span>
-                      <span className="text-[15px] leading-5 tracking-[0.15px] text-ink">{c}</span>
-                    </li>
+                    <motion.li key={c} variants={reduce ? undefined : coveredItem} className="flex items-start gap-1.5">
+                      <Image src="/images/checkmark_mini.svg" alt="" aria-hidden width={16} height={16} className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span className="text-[18px] leading-6 tracking-[0.18px] text-ink">{c}</span>
+                    </motion.li>
                   ))}
-                </ul>
+                </motion.ul>
               )}
 
               {/* Hint — covered by default, tap to reveal (replaces the 2-beat). */}
               <Hint text={hint} className="mt-3" />
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Fixed bottom bar — Why? / Got it (no sheet, no drag handle). */}
@@ -134,7 +164,7 @@ export function Verdict({
           <button
             type="button"
             onClick={onWhy}
-            className="flex h-14 items-center justify-center rounded-[36px] bg-secondary px-6 text-[18px] font-bold text-on-secondary shadow-[var(--shadow-button-inset)]"
+            className="flex h-14 items-center justify-center rounded-2xl bg-secondary px-6 text-[18px] font-bold text-on-secondary shadow-[var(--shadow-button-inset)]"
           >
             {t.why}
           </button>
@@ -142,7 +172,7 @@ export function Verdict({
             type="button"
             onClick={onPrimary}
             whileTap={{ scale: 0.97 }}
-            className={`flex h-14 flex-1 items-center justify-center rounded-[36px] px-6 text-[18px] font-bold shadow-[var(--shadow-button-inset)] ${primaryBg(kind)}`}
+            className={`flex h-14 flex-1 items-center justify-center rounded-2xl px-6 text-[18px] font-bold shadow-[var(--shadow-button-inset)] ${primaryBg(kind)}`}
           >
             {primaryLabel}
           </motion.button>
@@ -156,13 +186,16 @@ export function Verdict({
       {/* Prompt + transcribed answer (behind the sheet). */}
       <div className="flex flex-col gap-6 px-4 pt-4">
         <div className="relative">
-          <div className="absolute -left-[6px] top-4 h-3 w-3 rotate-45 rounded-[2px] bg-surface" aria-hidden />
-          <div className="rounded-md bg-surface p-4 text-[15px] leading-5 tracking-[0.15px] text-ink">{prompt}</div>
+          <div className="absolute -left-[6px] top-5 h-3 w-3 rotate-45 rounded-[2px] bg-surface" aria-hidden />
+          <div className="flex items-start gap-3 rounded-md bg-surface p-3">
+            <Image src="/images/knowie-bubble-3.svg" alt="" aria-hidden width={40} height={40} className="h-10 w-10 shrink-0" />
+            <p className="text-[18px] leading-6 tracking-[0.18px] text-ink">{prompt}</p>
+          </div>
         </div>
         <div className="flex justify-end">
-          <div className="flex w-[296px] flex-col gap-1.5 rounded-[18px] rounded-tr-[4px] bg-surface px-3.5 py-3">
+          <div className="flex w-[296px] flex-col gap-1.5 rounded-md rounded-tr-[4px] bg-surface px-3.5 py-3">
             <Waves />
-            <p className="text-[15px] leading-5 tracking-[0.15px] text-ink-2">&ldquo;{transcript}&rdquo;</p>
+            <p className="text-[18px] leading-6 tracking-[0.18px] text-ink-2">&ldquo;{transcript}&rdquo;</p>
           </div>
         </div>
       </div>
@@ -172,7 +205,7 @@ export function Verdict({
         initial={reduce ? { opacity: 0 } : { y: "100%" }}
         animate={reduce ? { opacity: 1 } : { y: 0 }}
         transition={sheet}
-        className={`absolute inset-x-0 bottom-0 flex flex-col rounded-t-[36px] border-t border-border ${sheetBg}`}
+        className={`absolute inset-x-0 bottom-0 flex flex-col rounded-t-2xl border-t border-border ${sheetBg}`}
       >
         <div className="flex justify-center pt-1.5">
           <Grabber />
@@ -182,10 +215,20 @@ export function Verdict({
         <div className="flex items-center gap-2 px-7 pt-3">
           <div className="flex flex-1 items-center gap-2">
             {kind === "pass" && (
-              <Image src="/images/Passed.svg" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
+              // A small confidence pop on the pass badge, a beat after the sheet
+              // settles (delay 0.2) — the "nice work" moment. Only pass animates;
+              // the fail badge stays static so a miss never gets a flashier entrance.
+              <motion.div
+                className="shrink-0"
+                initial={reduce ? false : { scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={reduce ? undefined : { ...gentle, delay: 0.2 }}
+              >
+                <Image src="/images/Passed.svg" alt="" aria-hidden width={24} height={24} className="h-6 w-6" />
+              </motion.div>
             )}
             {kind === "fail" && (
-              <Image src="/images/Fail.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 shrink-0" />
+              <Image src="/images/Fail.svg" alt="" aria-hidden width={24} height={24} className="h-6 w-6 shrink-0" />
             )}
             {kind === "skip" && <ArrowGlyph className={titleTone} />}
             <h2 className={`text-[28px] font-extrabold leading-7 tracking-[-0.3px] ${titleTone}`}>{title}</h2>
@@ -194,18 +237,26 @@ export function Verdict({
         </div>
 
         <div className="flex flex-col gap-6 px-7 pt-5 pb-[max(28px,env(safe-area-inset-bottom))]">
-          {/* You covered */}
+          {/* You covered — the checks stagger in after the sheet settles (same
+              coveredList/coveredItem variants as the inline branch) so a clean
+              pass reads as earned, not just acknowledged. Only reaches here for
+              pass; reduced motion shows the list plain. */}
           {showCovered && covered.length > 0 && (
-            <div className="flex flex-col gap-2 rounded-[24px] border-2 border-success-on-subtle bg-success-subtle p-4">
-              <p className="text-[18px] leading-6 tracking-[0.18px] text-success-on-subtle">{t.youCovered}</p>
-              <ul className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 rounded-lg border border-success-on-subtle/30 bg-success-subtle p-3">
+              <p className="text-[18px] font-bold leading-6 tracking-[0.18px] text-success-on-subtle">{t.youCovered}</p>
+              <motion.ul
+                className="flex flex-col gap-2"
+                variants={reduce ? undefined : coveredList}
+                initial={reduce ? undefined : "hidden"}
+                animate={reduce ? undefined : "show"}
+              >
                 {covered.map((c) => (
-                  <li key={c} className="flex items-start gap-1.5">
+                  <motion.li key={c} variants={reduce ? undefined : coveredItem} className="flex items-start gap-1.5">
                     <Image src="/images/checkmark_mini.svg" alt="" aria-hidden width={16} height={16} className="mt-0.5 h-4 w-4 shrink-0" />
-                    <span className="text-[15px] leading-5 tracking-[0.15px] text-ink">{c}</span>
-                  </li>
+                    <span className="text-[18px] leading-6 tracking-[0.18px] text-ink">{c}</span>
+                  </motion.li>
                 ))}
-              </ul>
+              </motion.ul>
             </div>
           )}
 
@@ -222,7 +273,7 @@ export function Verdict({
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success text-[color:var(--text-inverse)]">
                       <CheckIcon size={12} strokeWidth={3} />
                     </span>
-                    <span className="text-[15px] leading-5 tracking-[0.15px] text-ink">{c}</span>
+                    <span className="text-[18px] leading-6 tracking-[0.18px] text-ink">{c}</span>
                   </li>
                 ))}
               </ul>
@@ -234,13 +285,22 @@ export function Verdict({
               is coerced to fail). Stacking surface, 2px ink/50 border, Radius/600,
               Space/400. (Figma 13789:10390 / 13968:15004.) */}
           {hasHintSection && (
-            <div className="rounded-[24px] border-2 border-ink/50 bg-floating p-4">
+            // Knowie "steps in": the answer card rises in a beat after the sheet
+            // (rise + gentle, delay 0.25) so the reveal reads as handed over, not
+            // pre-printed. The Fail header and "You covered" checks above stay
+            // static — only the help arrives softly, so the miss never feels punished.
+            <motion.div
+              className="rounded-lg border border-border bg-floating p-3 shadow-[var(--shadow-card)]"
+              initial={reduce ? false : rise.initial}
+              animate={rise.animate}
+              transition={reduce ? undefined : { ...gentle, delay: 0.25 }}
+            >
               <div className="flex items-center gap-1.5">
                 <Image src="/images/answer.svg" alt="" aria-hidden width={20} height={20} className="h-5 w-5 shrink-0" />
                 <span className="text-[18px] font-bold leading-5 tracking-[0.18px] text-ink">{t.chipAnswer}</span>
               </div>
-              <p className="mt-2 text-[15px] leading-5 tracking-[0.15px] text-ink">{answer}</p>
-            </div>
+              <p className="mt-2 text-[18px] leading-6 tracking-[0.18px] text-ink">{answer}</p>
+            </motion.div>
           )}
 
           {/* CTAs */}
@@ -258,7 +318,7 @@ export function Verdict({
               <button
                 type="button"
                 onClick={onWhy}
-                className="flex h-14 items-center justify-center rounded-[36px] bg-secondary px-6 text-[18px] font-bold text-on-secondary shadow-[var(--shadow-button-inset)]"
+                className="flex h-14 items-center justify-center rounded-2xl bg-secondary px-6 text-[18px] font-bold text-on-secondary shadow-[var(--shadow-button-inset)]"
               >
                 {t.why}
               </button>
@@ -267,7 +327,7 @@ export function Verdict({
               type="button"
               onClick={onPrimary}
               whileTap={{ scale: 0.97 }}
-              className={`flex h-14 flex-1 items-center justify-center rounded-[36px] px-6 text-[18px] font-bold shadow-[var(--shadow-button-inset)] ${primaryBg(kind)}`}
+              className={`flex h-14 flex-1 items-center justify-center rounded-2xl px-6 text-[18px] font-bold shadow-[var(--shadow-button-inset)] ${primaryBg(kind)}`}
             >
               {primaryLabel}
             </motion.button>
@@ -285,8 +345,9 @@ export function Verdict({
    Figma Hint component 13963:38836. */
 function Hint({ text, className = "" }: { text: string; className?: string }) {
   const [revealed, setRevealed] = useState(false);
+  const reduce = useReducedMotion();
   return (
-    <div className={`rounded-[16px] border-2 border-pro/50 bg-pro-subtle p-3 ${className}`}>
+    <div className={`rounded-md border-2 border-pro/50 bg-pro-subtle p-3 ${className}`}>
       {/* Header — light bulb + label, visible in both states. */}
       <div className="flex items-center gap-1.5">
         <Image src="/images/Light Bulb Icon.svg" alt="" aria-hidden width={20} height={20} className="h-5 w-5" />
@@ -294,13 +355,26 @@ function Hint({ text, className = "" }: { text: string; className?: string }) {
       </div>
 
       {revealed ? (
-        <p className="mt-2.5 text-[15px] leading-5 tracking-[0.15px] text-ink">{text}</p>
+        // The revealed hint rises into place (rise + gentle) instead of snapping —
+        // the payoff for the tap-to-reveal forced-retrieval gate. It mounts fresh
+        // when `revealed` flips, so initial→animate plays once; reduced motion
+        // shows it instantly (initial=false).
+        <motion.p
+          className="mt-2.5 text-[18px] leading-6 tracking-[0.18px] text-ink"
+          initial={reduce ? false : rise.initial}
+          animate={rise.animate}
+          transition={reduce ? undefined : gentle}
+        >
+          {text}
+        </motion.p>
       ) : (
-        <button
+        <motion.button
           type="button"
           onClick={() => setRevealed(true)}
           aria-label={t.tapToView}
-          className="relative mt-2.5 block w-full"
+          whileTap={reduce ? undefined : { scale: 0.98 }}
+          transition={snappy}
+          className="relative mt-2.5 block w-full rounded-lg transition-colors active:bg-pro/10"
         >
           {/* Redacted bars. */}
           <span className="flex flex-col gap-2" aria-hidden>
@@ -310,11 +384,11 @@ function Hint({ text, className = "" }: { text: string; className?: string }) {
           </span>
           {/* Centered Tap-to-view pill. */}
           <span className="absolute inset-0 flex items-center justify-center">
-            <span className="rounded-lg bg-pro-subtle px-3 py-1.5 text-[15px] font-bold leading-5 text-pro ring-1 ring-inset ring-pro/40">
+            <span className="rounded-lg bg-pro-subtle p-3 text-[12px] font-bold leading-4 text-pro">
               {t.tapToView}
             </span>
           </span>
-        </button>
+        </motion.button>
       )}
     </div>
   );

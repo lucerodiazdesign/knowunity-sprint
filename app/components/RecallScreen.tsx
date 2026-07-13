@@ -180,7 +180,7 @@ export function RecallScreen({
           is too short (min-h-0 lets it shrink instead of pushing the controls
           off-screen). Gap-based spacing per Figma 13766-13630 — no absolute
           positioning, no fixed heights. */}
-      <div className="flex min-h-0 flex-1 flex-col gap-12 overflow-y-auto px-4 pt-6">
+      <div className="flex min-h-0 flex-1 flex-col gap-16 overflow-y-auto px-4 pt-6">
         {/* Prompt bubble (+ Previous-Mistake tag on a pass-2 retry). */}
         <div className="w-full">
           {pass === 2 && (
@@ -188,7 +188,7 @@ export function RecallScreen({
               <PreviousMistakeTag />
             </div>
           )}
-          <KnowieBubble mascot={POSE.ask.src} alt={POSE.ask.alt}>{term.prompt}</KnowieBubble>
+          <KnowieBubble mascot="/images/knowie-bubble-3.svg" alt={POSE.ask.alt} size="md">{term.prompt}</KnowieBubble>
         </div>
 
         {/* Answer waveform + helper. */}
@@ -200,7 +200,7 @@ export function RecallScreen({
 
       {/* Recording controls (Borrar / Reproducir / Usar texto + mic) — PINNED
           (shrink-0). Never scrolls, never clips; 30px gap per the reference. */}
-      <div className="flex shrink-0 flex-col items-center gap-[30px] pt-2">
+      <div className="flex shrink-0 flex-col items-center gap-8 pt-2">
         <div className="flex w-[248px] items-start justify-between">
           <ControlButton icon={<TrashIcon size={22} />} label={t.erase} onClick={() => dispatch({ type: "ERASE" })} disabled={!hasTake} />
           <ControlButton

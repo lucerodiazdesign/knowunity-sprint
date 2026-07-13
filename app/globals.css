@@ -48,6 +48,7 @@
   --accent-blue-on-subtle: #7ba8f2;
   --accent-green-bold: #00c386;
   --accent-green-subtle: #0a2e22;
+  --accent-green-on-bold: #0a1f18; /* content on green-bold (Figma: accent/green/onBold) */
 
   /* Feedback (transient verdict only — never persisted as a fail state) */
   --feedback-success-bold: #00c386;
@@ -56,6 +57,7 @@
   --feedback-error-bold: #ff6b6b;
   --feedback-error-subtle: #532831;
   --feedback-error-on-subtle: #fca5a5;
+  --feedback-error-on-bold: #2a0808; /* content on error-bold (Figma: feedback/error/onBold) */
 
   /* Pro / premium (gold) — used by the partial verdict "Almost there!" */
   --pro-bold: #f5b53d;
@@ -72,11 +74,20 @@
   --radius-400: 16px;
   --radius-600: 24px;
   --radius-800: 32px;
+  --radius-900: 36px;
   --radius-full: 9999px;
 
   /* Elevation — the pressable-button inset used across the design's controls */
   --shadow-button-inset: inset 0px -4px 0px 0px rgba(0, 0, 0, 0.15);
   --shadow-sheet: 0px 16px 32px -4px rgba(12, 12, 13, 0.4);
+  /* Mic — the primary affordance. Pressable inset + Drop Shadow/200 (two soft
+     layers, color ≈ #0C0C0D) so it lifts off the page rather than sitting flat. */
+  --shadow-mic: inset 0px -4px 0px 0px rgba(0, 0, 0, 0.15),
+    0px 1px 4px 0px rgba(12, 12, 13, 0.05), 0px 1px 4px 0px rgba(12, 12, 13, 0.1);
+  /* Drop Shadow/200 — subtle card lift (used so raised cards separate via
+     elevation + a hairline border rather than a harsh near-white stroke). */
+  --shadow-card: 0px 1px 4px 0px rgba(12, 12, 13, 0.05),
+    0px 1px 4px 0px rgba(12, 12, 13, 0.1);
 }
 
 @theme inline {
@@ -113,6 +124,7 @@
   --color-blue-on-subtle: var(--accent-blue-on-subtle);
   --color-green: var(--accent-green-bold);
   --color-green-subtle: var(--accent-green-subtle);
+  --color-green-on: var(--accent-green-on-bold);
 
   --color-success: var(--feedback-success-bold);
   --color-success-subtle: var(--feedback-success-subtle);
@@ -120,6 +132,7 @@
   --color-error: var(--feedback-error-bold);
   --color-error-subtle: var(--feedback-error-subtle);
   --color-error-on-subtle: var(--feedback-error-on-subtle);
+  --color-error-on: var(--feedback-error-on-bold);
 
   --color-pro: var(--pro-bold);
   --color-pro-on: var(--pro-on-bold);
@@ -133,6 +146,7 @@
   --radius-md: var(--radius-400);
   --radius-lg: var(--radius-600);
   --radius-xl: var(--radius-800);
+  --radius-2xl: var(--radius-900);
 
   /* Font */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;

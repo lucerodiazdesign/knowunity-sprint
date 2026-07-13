@@ -122,7 +122,7 @@ export function RecallPathNode({
             initial={reduce ? false : { scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={gentle}
-            className="absolute left-1/2 flex h-[22px] -translate-x-1/2 items-center justify-center whitespace-nowrap rounded-full border-2 border-page bg-coral px-2.5 text-[10px] font-extrabold tracking-[0.4px] text-ink"
+            className="absolute left-1/2 flex h-[22px] -translate-x-1/2 items-center justify-center whitespace-nowrap rounded-full border-2 border-page bg-coral px-2.5 text-[9px] font-extrabold tracking-[0.4px] text-ink"
             style={{ top: GAP + SIZE - 14 }}
           >
             {t.badgeNew}

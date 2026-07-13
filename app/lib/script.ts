@@ -95,9 +95,9 @@ const TERMS_ES: Term[] = [
     hint: "Ya tienes que las plantas usan la luz del sol para hacer alimento. Pero ¿qué TOMAN para fabricar ese alimento y qué liberan como subproducto?",
     fullAnswer:
       "La fotosíntesis es cómo las plantas fabrican su propio alimento. En las hojas, la clorofila capta la energía de la luz del sol. La planta toma dióxido de carbono del aire y agua de sus raíces, y usa la energía de la luz para convertirlos en glucosa (azúcar) como alimento, liberando oxígeno como subproducto.",
-    // T2: partial on both passes → queued, then answer revealed → revealed.
+    // T2: partial first try → hint → passes on retry → passed_with_hints.
     attempt1Result: "partial",
-    attempt2Result: "partial",
+    attempt2Result: "pass",
     attempt1Transcript:
       "Es cómo las plantas hacen su alimento usando la luz del sol. Usan la energía del sol para crecer.",
     attempt2Transcript:
@@ -166,7 +166,7 @@ const TERMS_EN: Term[] = [
     fullAnswer:
       "Photosynthesis is how plants make their own food. In the leaves, chlorophyll captures energy from sunlight. The plant takes in carbon dioxide from the air and water from its roots, and uses the light energy to turn them into glucose (sugar) for food — releasing oxygen as a by-product.",
     attempt1Result: "partial",
-    attempt2Result: "partial",
+    attempt2Result: "pass",
     attempt1Transcript:
       "It's how plants make their food using sunlight. They use the sun's energy to grow.",
     attempt2Transcript:

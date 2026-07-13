@@ -150,16 +150,16 @@ States and transitions:
      place — the tap is the deliberate forced-retrieval gate (it replaced the earlier timed ~2.5s pause).
      Partial and fully-wrong share this same inline-hint treatment, differing only in the heading
      (**"Almost there!"** vs **"Not quite"**) and whether a *what-you-covered* checkmark list is shown (partial:
-     yes; fully-wrong: none). **`partial` is an attempt-1 verdict only.** CTAs below: **Next** (primary) /
-     **See answer** (ghost).
+     yes; fully-wrong: none). CTAs below: **Next** (primary) / **See answer** (ghost).
      - **Next** → term is queued into the **end-of-session retry queue**; advance to next term.
      - **See answer** → opens the answer reveal (§8), locks **`revealed`**, advances.
 7. **Retry queue — attempt 2** (after all terms have had their main pass): every non-`unaided_pass` term is
    re-presented on the same Recall screen and the student records **once more**. This is the **final** attempt:
-   - **Correct** → lock **`passed_with_hints`** (result sheet, pass styling).
-   - **Any non-correct result** → **FAIL + answer reveal** in the **result sheet**: a **"Not quite"** header
-     over an **Answer card** holding Knowie's full written answer, locking **`revealed`**. **There is no
-     `partial` verdict on attempt 2.** Two variants: **some-right** — the *what-you-covered* checkmark list
+   - **Correct** → lock **`passed_with_hints`** → **pass sheet**, heading **"With a nudge"**.
+   - **Not passed** — the backend may score this **partial** OR **fully-wrong** → **FAIL + answer reveal** in the
+     **result sheet**: a **"Worth another look"** header over an **Answer card** holding Knowie's full written
+     answer, locking **`revealed`**. **"partial" is never surfaced as its own screen** — any not-passed attempt-2
+     result maps to this fail reveal. Two variants: **some-right** — the *what-you-covered* checkmark list
      **above** the Answer card; **all-wrong** — the Answer card only.
 8. After the retry queue clears → push to **Summary**.
 
@@ -171,8 +171,11 @@ Summary's Continue). Skip is reachable in every state that has a mic; it logs `s
 ## 6. Invariants (must hold — from CLAUDE.md / sprint-context)
 
 - Four terminal states only; **no persisted `fail`**.
-- On an **attempt-1 miss** (partial OR fully-wrong) the hint is a covered **"Little Hint"** card revealed by **tap** (the deliberate forced-retrieval gate). **`partial` is an attempt-1 verdict only.**
-- On **attempt 2**, any non-correct result resolves to **FAIL + answer reveal** in the result sheet — two variants: *some-right* (what-you-covered list + answer) and *all-wrong* (answer only). Correct on attempt 2 → `passed_with_hints`.
+- On an **attempt-1 miss** (partial OR fully-wrong) the hint is a covered **"Little Hint"** card revealed by **tap** (the deliberate forced-retrieval gate).
+- The backend scores **pass / partial / fail** on either attempt (partial **can** occur on attempt 2), but the user is **never shown "partial" as its own screen**. The verdict heading is one of **three presentation labels**, driven by *(passed? + which attempt)*:
+  - **"On their own"** — passed on attempt 1, no hint → **pass sheet**.
+  - **"With a nudge"** — passed on attempt 2, after the hint → **pass sheet**.
+  - **"Worth another look"** — not passed after attempt 2 (partial or fully-wrong) → **fail reveal** (some-right / all-wrong).
 - **Hint 1** is the attempt-1 miss hint (main pass). Attempt 2 shows **no hint** — a non-correct retry goes straight to the **answer reveal**. (Supersedes the earlier "Hint 2 on the retry" model.)
 - Retry-queue second-miss reveal is **automatic**; the main-pass "See answer" is a **separate opt-in** — keep both.
 - Push-to-talk needs an **explicit Send**; no auto-endpointing / speech-end detection.

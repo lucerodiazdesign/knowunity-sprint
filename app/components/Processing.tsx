@@ -19,22 +19,21 @@ export function Processing({ prompt, transcript }: { prompt: string; transcript:
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden">
-      {/* Conversation turn + thinking line flow in ONE flex column with a single
-          16px (space-400) gap, so the thinking text sits directly below the
-          transcript regardless of answer length — no absolute offsets / fixed
-          491px pin, no hardcoded margin. */}
+      {/* Conversation turn — stays at the TOP and scrolls if long. The empty
+          space between it and the caption/mascot group opens up here (flex-1). */}
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pt-2">
         {/* One conversation turn: Knowie's question stays on top (left-aligned),
             the student's answer stacks below (right-aligned). */}
         <div className="flex flex-col gap-4">
-          {/* Knowie's question — persists, left-aligned with a tail. */}
+          {/* Knowie's question — intro treatment (40×40 avatar inside, left of text). */}
           <div className="relative">
             <div
-              className="absolute -left-[6px] top-1/2 h-3 w-3 -translate-y-1/2 rotate-45 rounded-[2px] bg-surface"
+              className="absolute -left-[6px] top-5 h-3 w-3 rotate-45 rounded-[2px] bg-surface"
               aria-hidden
             />
-            <div className="rounded-md bg-surface p-4 text-[18px] leading-6 tracking-[0.18px] text-ink">
-              {prompt}
+            <div className="flex items-start gap-3 rounded-md bg-surface p-3">
+              <Image src="/images/knowie-bubble-3.svg" alt="" aria-hidden width={40} height={40} className="h-10 w-10 shrink-0" />
+              <p className="text-[18px] leading-6 tracking-[0.18px] text-ink">{prompt}</p>
             </div>
           </div>
 
@@ -49,24 +48,27 @@ export function Processing({ prompt, transcript }: { prompt: string; transcript:
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Knowie's thinking line — in flow, 16px below the transcript via the
-            column's gap-4 token (no hardcoded margin). */}
+      {/* Caption + peeking mascot — ONE bottom-anchored, left-aligned group with a
+          FIXED gap (gap-6 = 24px). The thinking line always sits directly ABOVE
+          Knowie's head as a pair (never jammed beside it), and the structural gap
+          means they can't overlap at any caption length or mascot size. The mascot
+          keeps its "peek" via -mb-5 + the parent's overflow-hidden. */}
+      <div className="flex shrink-0 flex-col items-start gap-6 px-4 pt-2">
         <h2 className="max-w-[240px] text-[28px] font-extrabold leading-[30px] tracking-[-0.2px] text-ink">
           {t.thinking}
           <Dots animate={!reduce} />
         </h2>
+        <motion.div
+          aria-hidden
+          className="pointer-events-none relative -mb-5 h-[200px] w-[200px]"
+          animate={reduce ? undefined : { y: [0, -8, 0] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Image src="/images/standby.png" alt="" fill sizes="200px" className="object-contain object-bottom" priority />
+        </motion.div>
       </div>
-
-      {/* Standby Knowie, peeking from the bottom-right with a gentle bob. */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-5 -right-3 h-[200px] w-[200px]"
-        animate={reduce ? undefined : { y: [0, -8, 0] }}
-        transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <Image src="/images/standby.png" alt="" fill sizes="200px" className="object-contain" priority />
-      </motion.div>
     </div>
   );
 }

@@ -93,7 +93,7 @@ export function PathNode({
         {label}
       </span>
       {caption && (
-        <span className="-mt-1 rounded bg-surface px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.6px] text-ink-3">
+        <span className="-mt-1 rounded bg-surface px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.6px] text-ink-3">
           {caption}
         </span>
       )}
@@ -129,7 +129,7 @@ function Badge({ kind }: { kind: NodeBadge }) {
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={gentle}
-      className={`${anchor} h-[22px] whitespace-nowrap rounded-full px-2.5 text-[10px] font-extrabold tracking-[0.4px] text-ink ${
+      className={`${anchor} h-[22px] whitespace-nowrap rounded-full px-2.5 text-[9px] font-extrabold tracking-[0.4px] text-ink ${
         isNew ? "bg-coral" : "bg-brand"
       }`}
       style={{ top: top + 2 }}

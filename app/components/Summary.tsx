@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { animate, motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PillButton, GhostButton } from "./controls";
 import { BoltIcon } from "./icons";
 import { TERMS, type Terminal } from "../lib/script";
@@ -11,25 +11,17 @@ import { gentle } from "../lib/motion";
 import type { MachineState } from "../lib/useRecallMachine";
 
 // Per-term row tag colors, keyed by terminal state. Figma maps text = X/bold on
-// bg = X/onbold. Code has an exact token only for pro/onbold (→ pro-on); green
-// and error have no "onbold" token, so the nearest existing dark token is used
-// (green-subtle / error-subtle — flagged in the report). `skipped` is a TODO
-// placeholder tag and is deliberately NOT the reveal tag.
+// bg = X/onBold. All three now bind to their exact onBold token (green/error
+// onBold values extracted from the Figma "Semantic color token" collection).
+// `skipped` is a TODO placeholder tag and is deliberately NOT the reveal tag.
 const TAG: Record<Terminal, { text: string; bg: string }> = {
-  unaided_pass: { text: "text-green", bg: "bg-green-subtle" }, // accent/green/onbold → green-subtle (closest existing)
-  passed_with_hints: { text: "text-pro", bg: "bg-pro-on" }, // pro/onbold → pro-on (exact)
-  revealed: { text: "text-error", bg: "bg-error-subtle" }, // feedback/error/onbold → error-subtle (closest existing)
+  unaided_pass: { text: "text-green", bg: "bg-green-on" }, // accent/green/onBold (exact)
+  passed_with_hints: { text: "text-pro", bg: "bg-pro-on" }, // pro/onBold (exact)
+  revealed: { text: "text-error", bg: "bg-error-on" }, // feedback/error/onBold (exact)
   // TODO(Lucero): skipped treatment undecided — own tag vs folded into
   // "Worth another look". Neutral placeholder; NOT reusing the reveal tag.
   skipped: { text: "text-ink-2", bg: "bg-surface" },
 };
-
-// TODO(Lucero): SCORE is UNDEFINED and CLAUDE.md forbids a summary score
-// ("Summary never shows a score … No weighted composite score, ever."). The
-// numerator/denominator is unspecified, so the value is intentionally NOT bound
-// to a guessed count — placeholder only. The box renders per Figma so you can
-// decide whether to keep a SCORE at all, and what it should mean.
-const SCORE_TODO = "–/–";
 
 const container = {
   hidden: {},
@@ -39,6 +31,29 @@ const item = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: gentle },
 };
+
+// XP / SCORE tick-up — the number counts from 0 to its final value as the
+// summary lands, so the score reads as earned rather than instant. Honors
+// reduced motion (shows the final value, no tick). The call sites use
+// tabular-nums so the width stays steady while the digits change.
+function CountUp({ to, delay = 0.35, duration = 0.9 }: { to: number; delay?: number; duration?: number }) {
+  const reduce = useReducedMotion();
+  const [n, setN] = useState(reduce ? to : 0);
+  useEffect(() => {
+    if (reduce) {
+      setN(to);
+      return;
+    }
+    const controls = animate(0, to, {
+      delay,
+      duration,
+      ease: "easeOut",
+      onUpdate: (v) => setN(Math.round(v)),
+    });
+    return () => controls.stop();
+  }, [to, delay, duration, reduce]);
+  return <>{n}</>;
+}
 
 // Bullseye — the SCORE box icon (matches Figma's target glyph).
 function TargetGlyph({ className }: { className?: string }) {
@@ -158,17 +173,18 @@ export function Summary({
             </span>
             <div className="flex w-full items-center justify-center gap-1.5 rounded-md bg-page p-3">
               <BoltIcon size={22} className="text-blue" />
-              <span className="text-[28px] font-bold leading-7 tabular-nums text-blue">{state.xp}</span>
+              <span className="text-[28px] font-bold leading-7 tabular-nums text-blue"><CountUp to={state.xp} /></span>
             </div>
           </div>
-          {/* SCORE — value is a marked TODO (see SCORE_TODO / report). */}
+          {/* SCORE — unaided passes (unaided_pass ONLY) out of total terms presented.
+              Diagnostic display count per SPEC/F9, not a graded score. */}
           <div className="flex flex-1 flex-col items-center rounded-md border-2 border-green bg-green">
             <span className="py-1 text-[15px] font-bold leading-5 tracking-[0.15px] text-ink-inv">
               {t.scoreBoxLabel}
             </span>
             <div className="flex w-full items-center justify-center gap-1.5 rounded-md bg-page p-3">
               <TargetGlyph className="text-green" />
-              <span className="text-[28px] font-bold leading-7 tabular-nums text-green">{SCORE_TODO}</span>
+              <span className="text-[28px] font-bold leading-7 tabular-nums text-green"><CountUp to={unaidedCount} />/{total}</span>
             </div>
           </div>
         </motion.div>
@@ -205,11 +221,15 @@ export function Summary({
       <div className="mt-4 flex shrink-0 flex-col gap-2">
         <PillButton onClick={onContinue} disabled={collecting}>
           {collecting ? (
+            // Collect beat reuses the TopBar's XP pop (key-swap scale 0.8→1 on
+            // gentle) instead of a generic pulse, so "collected" reads as the same
+            // number the student just watched tick up — the loop closes on itself.
             <motion.span
+              key={state.xp}
               className="flex items-center gap-1"
-              initial={{ scale: 1 }}
-              animate={{ scale: [1, 1.15, 1] }}
-              transition={{ duration: 0.5 }}
+              initial={reduce ? false : { scale: 0.8, opacity: 0.6 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={reduce ? undefined : gentle}
             >
               <BoltIcon size={18} /> {t.xpCollected(state.xp)}
             </motion.span>

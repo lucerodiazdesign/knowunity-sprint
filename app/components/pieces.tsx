@@ -24,10 +24,20 @@ export function Waveform({ mode, progress = 0 }: { mode: WaveMode; progress?: nu
   const animating = mode === "recording" && !reduce;
 
   return (
-    <div className="flex h-[101px] items-center justify-center" style={{ gap: 11.442 }}>
+    // ONE fixed-height box (never resizes between states), content vertically
+    // centered: the idle "dots" and the active bars share the same 101px
+    // container and the same center point — only the contents swap (bar heights
+    // below), so the zone (and the caption under it) never jumps.
+    <div
+      className="flex h-[101px] items-center justify-center"
+      style={{ gap: 11.442 }}
+    >
       {BARS.map((h, i) => {
         const played = mode === "playing" && (i + 0.5) / BARS.length <= progress;
-        const opacity = mode === "playing" ? (played ? 1 : 0.28) : flat ? 0.5 : 0.66;
+        // idle (flat) sits at low opacity so the empty waveform reads as
+        // "waiting", not content — it must not compete with the prompt + mic
+        // before a take exists.
+        const opacity = mode === "playing" ? (played ? 1 : 0.28) : flat ? 0.18 : 0.66;
         const peak = 1 + (0.15 + Math.abs(Math.sin(i * 1.7)) * 0.35);
         return (
           <motion.span
@@ -47,18 +57,22 @@ export function Waveform({ mode, progress = 0 }: { mode: WaveMode; progress?: nu
   );
 }
 
-/* Knowie's chat bubble: mascot on the left, surface bubble with a small tail on
-   the right. Knowie replies in TEXT only — this bubble is how she "speaks". */
+/* Knowie's chat bubble — the intro treatment (Figma 13969:15315): the 40×40
+   avatar sits INSIDE the surface bubble, left of the text, with a small left
+   tail. Used for the FIRST Knowie question of each term. Knowie replies in TEXT
+   only — this bubble is how she "speaks". */
 export function KnowieBubble({
   mascot,
   alt,
   children,
   tone = "neutral",
+  size = "sm",
 }: {
   mascot: string;
   alt: string;
   children: ReactNode;
   tone?: "neutral" | "success" | "error";
+  size?: "sm" | "md";
 }) {
   const reduce = useReducedMotion();
   const ring =
@@ -67,39 +81,26 @@ export function KnowieBubble({
       : tone === "error"
         ? "ring-1 ring-error/40"
         : "";
+  // Body M 18/24 everywhere — `size` is retained for the call sites but no longer
+  // varies the type ramp; the shared chat bubble reads identically.
+  void size;
   return (
-    <div className="flex items-start gap-2">
+    <div className="relative">
+      {/* left tail */}
+      <div
+        className="absolute -left-[6px] top-5 h-3 w-3 rotate-45 rounded-[2px] bg-surface"
+        aria-hidden
+      />
       <motion.div
-        className="relative h-[70px] w-[70px] shrink-0"
-        initial={reduce ? false : { scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
+        initial={reduce ? false : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={gentle}
+        className={`relative flex items-start gap-3 rounded-md bg-surface p-3 ${ring}`}
       >
-        <Image
-          src={mascot}
-          alt={alt}
-          fill
-          sizes="70px"
-          className="object-contain"
-          priority
-        />
+        {/* Knowie avatar — 40×40, inside the bubble, to the left of the text. */}
+        <Image src={mascot} alt={alt} width={40} height={40} className="h-10 w-10 shrink-0" priority />
+        <p className="text-[18px] leading-6 tracking-[0.18px] text-ink">{children}</p>
       </motion.div>
-
-      <div className="relative mt-1 flex-1">
-        {/* tail */}
-        <div
-          className="absolute -left-[6px] top-4 h-3 w-3 rotate-45 rounded-[2px] bg-surface"
-          aria-hidden
-        />
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={gentle}
-          className={`relative rounded-md bg-surface p-4 text-[15px] leading-[20px] tracking-[0.15px] text-ink ${ring}`}
-        >
-          {children}
-        </motion.div>
-      </div>
     </div>
   );
 }

@@ -45,6 +45,7 @@ const en = {
   closeIntro: "Close intro",
   step: (n: number) => `Step ${n} of 2`,
   continue: "Continue",
+  allowMic: "Allow microphone",
   requesting: "Requesting…",
   slide1Headline: "You've read it. Can you say it?",
   slide1Subtitle: "Explain each idea to Knowie out loud. That's how you find out what you actually know.",
@@ -59,8 +60,8 @@ const en = {
   replay: "Play",
   useText: "Use text",
   send: "Send",
-  notRelevant: "Not relevant",
-  previousMistake: "Error anterior", // FLAGGED — previous-mistake tag; your English call
+  notRelevant: "Skip this one",
+  previousMistake: "Previous mistake", // FLAGGED — previous-mistake tag; your English call
   helperRecording: "Listening… tap to stop",
   helperPlaying: "Playing…",
   helperReview: "Happy with that? Send it",
@@ -98,8 +99,8 @@ const en = {
   summaryTitleFailed: "It's a start", // Figma has the typo "Its a start" — corrected here
   summaryTitlePartial: "Almost there!",
   summaryTitlePassed: "Perfect lesson!",
-  summarySubtitleTryAgain: "Every expert was once a beginner. Keep going!",
-  summarySubtitlePassed: "You made 0 mistakes. How?!",
+  summarySubtitleTryAgain: "You're building the recall — keep going.",
+  summarySubtitlePassed: "Zero misses. Very impressive.",
   xpBoxLabel: "XP",
   scoreBoxLabel: "SCORE",
   summaryMascotApproving: "Knowie, approving your effort",
@@ -152,6 +153,7 @@ const es: Dict = {
   closeIntro: "Cerrar introducción",
   step: (n: number) => `Paso ${n} de 2`,
   continue: "Continuar",
+  allowMic: "Permitir micrófono",
   requesting: "Solicitando…",
   // Slide 1 copy was locked to English by you in a prior task — kept as-is.
   slide1Headline: "You've read it. Can you say it?",
@@ -167,8 +169,8 @@ const es: Dict = {
   replay: "Reproducir",
   useText: "Usar texto",
   send: "Enviar",
-  notRelevant: "No relevante",
-  previousMistake: "Error anterior", // FLAGGED
+  notRelevant: "Omitir esta",
+  previousMistake: "Previous mistake", // FLAGGED
   helperRecording: "Escuchando… toca para parar",
   helperPlaying: "Reproduciendo…",
   helperReview: "¿Te convence? Envíalo",
@@ -205,8 +207,8 @@ const es: Dict = {
   summaryTitleFailed: "Es un comienzo",
   summaryTitlePartial: "¡Casi lo tienes!",
   summaryTitlePassed: "¡Lección perfecta!",
-  summarySubtitleTryAgain: "Todo experto fue una vez principiante. ¡Sigue así!",
-  summarySubtitlePassed: "No cometiste ni un error. ¿Cómo?!",
+  summarySubtitleTryAgain: "Estás construyendo tu memoria — sigue así.",
+  summarySubtitlePassed: "Cero fallos. Muy impresionante.",
   xpBoxLabel: "XP",
   scoreBoxLabel: "PUNTAJE",
   summaryMascotApproving: "Knowie, aprobando tu esfuerzo",

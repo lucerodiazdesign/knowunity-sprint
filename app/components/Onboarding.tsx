@@ -128,7 +128,7 @@ export function Onboarding({
     else onPrimerContinue();
   };
   const ctaBusy = page === 1 && micBusy;
-  const ctaLabel = ctaBusy ? t.requesting : t.continue;
+  const ctaLabel = ctaBusy ? t.requesting : page === 1 ? t.allowMic : t.continue;
 
   return (
     <div className="flex h-full flex-col">

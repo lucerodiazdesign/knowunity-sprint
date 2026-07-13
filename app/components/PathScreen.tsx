@@ -116,7 +116,7 @@ export function PathScreen({
           </div>
           <button type="button" className="flex items-center gap-1" aria-label={t.changeSubject}>
             <span aria-hidden>📚</span>
-            <span className="text-[20px] font-extrabold tracking-[-0.2px] text-ink">{t.subject}</span>
+            <span className="text-[21px] font-extrabold tracking-[-0.2px] text-ink">{t.subject}</span>
             <Chevron />
           </button>
           <button type="button" className="flex h-9 w-9 items-center justify-center rounded-full bg-surface" aria-label={t.more}>
@@ -124,7 +124,7 @@ export function PathScreen({
           </button>
         </div>
 
-        <div className="mt-2 flex items-center justify-center gap-4 text-[13px]">
+        <div className="mt-2 flex items-center justify-center gap-4 text-[12px]">
           <span className="flex items-center gap-1.5 text-ink-2">
             <CalIcon /> {t.weekLeft}
           </span>
@@ -136,7 +136,7 @@ export function PathScreen({
         {/* Current-topic card */}
         <div className="mt-3 flex items-stretch overflow-hidden rounded-lg ring-1 ring-border">
           <div className="flex flex-1 items-center px-4 py-3.5">
-            <span className="text-[16px] font-bold text-ink">{t.currentTopic}</span>
+            <span className="text-[18px] font-bold text-ink">{t.currentTopic}</span>
           </div>
           <div className="flex items-center justify-center border-l border-border px-4">
             <BookIcon />
@@ -155,7 +155,7 @@ export function PathScreen({
           {/* Final-review section header — thin centered divider. */}
           <div className="my-4 flex w-full items-center gap-3">
             <span className="h-px flex-1 bg-border" />
-            <span className="whitespace-nowrap text-[13px] font-bold tracking-[0.1px] text-ink-2">
+            <span className="whitespace-nowrap text-[12px] font-bold tracking-[0.1px] text-ink-2">
               {t.pathFinalReview}
             </span>
             <span className="h-px flex-1 bg-border" />
@@ -211,7 +211,7 @@ function BottomNav() {
       <Item dot>
         <svg viewBox="0 0 24 24" width={24} height={24} fill="none" aria-hidden><path d="M8 4.5h8v4a4 4 0 01-8 0v-4z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /><path d="M8 6H5.5a2.5 2.5 0 002 3M16 6h2.5a2.5 2.5 0 01-2 3M9.5 15h5M10 19h4M12 12.5V15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </Item>
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface text-[13px] font-bold text-ink-2">L</div>
+      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface text-[12px] font-bold text-ink-2">L</div>
     </div>
   );
 }
